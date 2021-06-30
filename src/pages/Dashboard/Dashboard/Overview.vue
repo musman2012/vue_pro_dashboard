@@ -1,6 +1,46 @@
 <template>
   <div>
       <div class="row">
+        <!-- <div class="col-md-6"> -->
+          <div class="col-lg-4">
+            <h5 class="title">Select Starting and Ending Date</h5>
+            <fg-input>
+              <el-date-picker
+                v-model="dateTimePicker"
+                type="datetimerange"
+                placeholder="Datetime picker here"
+                :picker-options="pickerOptions1">
+              </el-date-picker>
+            </fg-input>
+          </div>
+          
+          <div class="col-md-6">
+                <h5 class="title">Select Production Line</h5>
+                <el-select class="select-danger"
+                           size="large"
+                           placeholder="Select Line"
+                           v-model="line_names.simple">
+                  <el-option v-for="option in line_names.fetched_lines"
+                             class="select-danger"
+                             :value="option.value"
+                             :label="option.label"
+                             :key="option.label">
+                  </el-option>
+                </el-select>
+          </div>
+
+          
+          <!-- <drop-down>
+            <i slot="title" class="nc-settings-gear-64">Select the Production Line</i>
+            <a class="dropdown-item" href="#">Line 3</a>
+            <a class="dropdown-item" href="#">Line2 PA Local</a>
+            <a class="dropdown-item" href="#">PPMA Mw</a>
+            <a class="dropdown-item" href="#">Kitchen</a>
+          </drop-down> -->
+        <!-- </div> -->
+      </div>
+      <div class="row">
+        
         <div class="col-xl-3 col-md-6">
           <stats-card title="150GB" subTitle="Numbers">
             <div slot="header" class="icon-warning">
@@ -92,6 +132,14 @@
       </div>
 
       <div class="row">
+
+        <div class="col-md-6">
+
+        <PaginatedTables />
+        </div>
+      </div>
+
+      <div class="row">
         <div class="col-md-6">
           <chart-card
             :chart-data="barChart.data"
@@ -144,6 +192,10 @@
 </template>
 <script>
   import {ChartCard, StatsCard, Card, Table as LTable, Checkbox} from 'src/components/index'
+  //import Dropdown from 'src/components/Dropdown'
+  import Dropdown from '../../../components/Dropdown.vue'
+  import { DatePicker, TimeSelect, Slider, Tag, Input, Button, Select, Option } from 'element-ui'
+import PaginatedTables from '../Tables/PaginatedTables.vue'
 
   export default {
     components: {
@@ -151,7 +203,15 @@
       Card,
       LTable,
       ChartCard,
-      StatsCard
+     // Select,
+      [DatePicker.name]: DatePicker,
+      [TimeSelect.name]: TimeSelect,
+      [Slider.name]: Slider,
+      [Option.name]: Option,
+      [Select.name]: Select,
+      StatsCard,
+      Dropdown,
+        PaginatedTables
     },
     data () {
       return {
@@ -222,6 +282,15 @@
                 }
               }
             }]
+          ]
+        },
+        line_names: {
+          simple: '',
+          fetched_lines: [
+            {value: 'Line 3', label: 'Line 3'},
+            {value: 'Line2 PA Local', label: 'Line2 PA Local'},
+            {value: 'PPMA Mw', label: 'PPMA Mw'},
+            {value: 'Kitchen', label: 'Kitchen'}
           ]
         },
         tableData: {
