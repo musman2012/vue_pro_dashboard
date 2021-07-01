@@ -36,7 +36,14 @@
         </el-select>
       </div>
 
-      
+      <!-- <drop-down>
+            <i slot="title" class="nc-settings-gear-64">Select the Production Line</i>
+            <a class="dropdown-item" href="#">Line 3</a>
+            <a class="dropdown-item" href="#">Line2 PA Local</a>
+            <a class="dropdown-item" href="#">PPMA Mw</a>
+            <a class="dropdown-item" href="#">Kitchen</a>
+          </drop-down> -->
+      <!-- </div> -->
     </div>
     <div class="row">
       <div class="col-xl-3 col-md-6">
@@ -108,9 +115,17 @@
       </div>
 
       <div class="col-md-8">
+        <PaginatedTables />
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Chart One -->
+      <div class="col-md-6">
         <chart-card
           :chart-data="lineChart.data"
           :chart-options="lineChart.options"
+          :responsive-options="lineChart.responsiveOptions"
         >
           <template slot="header">
             <h4 class="card-title">Packs Per Minute</h4>
@@ -129,20 +144,32 @@
           </template>
         </chart-card>
       </div>
-    </div>
 
-    
-
-    <div class="row">
-      <!-- Chart One -->
-      
-
-      <!-- Chart Two - To be used as backup -->
+      <!-- Chart Two -->
       <div class="col-md-6">
         <div id="pie_chart_parent" style="background-color: blue">
           <!-- <canvas id="div_line_pie_chart">
                 </canvas> -->
         </div>
+        <!-- <chart-card :chart-data="lineChart.data"
+                      :chart-options="lineChart.options"
+                      :responsive-options="lineChart.responsiveOptions">
+            <template slot="header">
+              <h4 class="card-title">Batch Speed Per User</h4>
+              <p class="card-category">24 Hours performance</p>
+            </template>
+            <template slot="footer">
+              <div class="legend">
+                <i class="fa fa-circle text-info"></i> Open
+                <i class="fa fa-circle text-danger"></i> Click
+                <i class="fa fa-circle text-warning"></i> Click Second Time
+              </div>
+              <hr>
+              <div class="stats">
+                <i class="fa fa-history"></i> Updated 3 minutes ago
+              </div>
+            </template>
+          </chart-card> -->
       </div>
     </div>
  
@@ -178,9 +205,58 @@
         </card>
       </div>
     </div>
+
+    <!-- <div class="row">
+        <div class="col-md-6">
+          <chart-card
+            :chart-data="barChart.data"
+            :chart-options="barChart.options"
+            :chart-responsive-options="barChart.responsiveOptions"
+            chart-type="Bar">
+            <template slot="header">
+              <h4 class="card-title">2014 Sales</h4>
+              <p class="card-category">All products including Taxes</p>
+            </template>
+            <template slot="footer">
+              <div class="legend">
+                <i class="fa fa-circle text-info"></i> Tesla Model S
+                <i class="fa fa-circle text-danger"></i> BMW 5 Series
+              </div>
+              <hr>
+              <div class="stats">
+                <i class="fa fa-check"></i> Data information certified
+              </div>
+            </template>
+          </chart-card>
+        </div>
+
+        <div class="col-md-6">
+          <card class="card-tasks" title="Tasks" subTitle="Backend development">
+            <l-table :data="tableData.data">
+              <template slot-scope="{row}">
+                <td>
+                  <Checkbox v-model="row.checked"></Checkbox>
+                </td>
+                <td>{{row.title}}</td>
+                <td class="td-actions d-flex justify-content-end">
+                  <div class="btn btn-info btn-simple btn-link" v-tooltip.top-center="editTooltip">
+                    <i class="fa fa-edit"></i>
+                  </div>
+                  <div class="btn btn-danger btn-simple btn-link" v-tooltip.top-center="deleteTooltip">
+                    <i class="fa fa-times"></i>
+                  </div>
+                </td>
+              </template>
+            </l-table>
+            <div class="stats" slot="footer">
+              <i class="fa fa-history"></i> Updated 3 minutes ago
+            </div>
+          </card>
+
+        </div>
+      </div> -->
   </div>
 </template>
-
 <script>
 import {
   ChartCard,
@@ -190,7 +266,7 @@ import {
   Checkbox,
 } from "src/components/index";
 //import Dropdown from 'src/components/Dropdown'
-// import Dropdown from "../../../components/Dropdown.vue";
+import Dropdown from "../../../components/Dropdown.vue";
 import {
   DatePicker,
   TimeSelect,
@@ -203,7 +279,7 @@ import {
   Table, 
   TableColumn
 } from "element-ui";
-//import PaginatedTables from "../Tables/PaginatedTables.vue";
+import PaginatedTables from "../Tables/PaginatedTables.vue";
 import axios from "axios";
 
 export default {
@@ -220,7 +296,9 @@ export default {
     [Select.name]: Select,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
-    StatsCard
+    StatsCard,
+    Dropdown,
+    PaginatedTables,
   },
   data() {
     return {
@@ -282,6 +360,61 @@ export default {
             right: 50,
           },
         },
+        
+        responsiveOptions: [
+          [
+            "screen and (max-width: 640px)",
+            {
+              axisX: {
+                labelInterpolationFnc: function (value) {
+                  return value[0];
+                },
+              },
+            },
+          ],
+        ],
+      },
+      barChart: {
+        data: {
+          labels: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "Mai",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ],
+          series: [
+            [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
+            [412, 243, 280, 580, 453, 353, 300, 364, 368, 410, 636, 695],
+          ],
+        },
+        options: {
+          seriesBarDistance: 10,
+          axisX: {
+            showGrid: false,
+          },
+          height: "245px",
+        },
+        responsiveOptions: [
+          [
+            "screen and (max-width: 640px)",
+            {
+              seriesBarDistance: 5,
+              axisX: {
+                labelInterpolationFnc(value) {
+                  return value[0];
+                },
+              },
+            },
+          ],
+        ],
       },
       line_names: {
         simple: "",
@@ -290,6 +423,31 @@ export default {
           { value: "Line2 PA Local", label: "Line2 PA Local" },
           { value: "PPMA Mw", label: "PPMA Mw" },
           { value: "Kitchen", label: "Kitchen" },
+        ],
+      },
+      tableData: {
+        data: [
+          {
+            title:
+              'Sign contract for "What are conference organizers afraid of?"',
+            checked: false,
+          },
+          {
+            title:
+              "Lines From Great Russian Literature? Or E-mails From My Boss?",
+            checked: true,
+          },
+          {
+            title:
+              "Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit",
+            checked: true,
+          },
+          {
+            title: "Create 4 Invisible User Experiences you Never Knew About",
+            checked: false,
+          },
+          { title: 'Read "Following makes Medium better"', checked: false },
+          { title: "Unfollow 5 enemies from twitter", checked: false },
         ],
       },
     };
