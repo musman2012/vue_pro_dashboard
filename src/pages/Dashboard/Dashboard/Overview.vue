@@ -16,8 +16,8 @@
           
           <div class="col-md-6">
                 <h5 class="title">Select Production Line</h5>
-                <el-select class="select-danger"
-                           size="large"
+                <el-select @input="dispatch" class="select-danger"
+                           :remote-method="filter" size="large"
                            placeholder="Select Line"
                            v-model="line_names.simple">
                   <el-option v-for="option in line_names.fetched_lines"
@@ -42,7 +42,7 @@
       <div class="row">
         
         <div class="col-xl-3 col-md-6">
-          <stats-card title="150GB" subTitle="Numbers">
+          <stats-card title="150GB" subTitle="Total Packs">
             <div slot="header" class="icon-warning">
               <i class="nc-icon nc-chart text-warning"></i>
             </div>
@@ -53,7 +53,7 @@
         </div>
 
         <div class="col-xl-3 col-md-6">
-          <stats-card title="$ 1,345" subTitle="Revenue">
+          <stats-card title="$ 1,345" subTitle="Total Cost">
             <div slot="header" class="icon-success">
               <i class="nc-icon nc-light-3 text-success"></i>
             </div>
@@ -64,7 +64,7 @@
         </div>
 
         <div class="col-xl-3 col-md-6">
-          <stats-card title="23" subTitle="Errors">
+          <stats-card title="23" subTitle="Downtime">
             <div slot="header" class="icon-danger">
               <i class="nc-icon nc-vector text-danger"></i>
             </div>
@@ -75,7 +75,7 @@
         </div>
 
         <div class="col-xl-3 col-md-6">
-          <stats-card title="+45K" subTitle="Followers">
+          <stats-card title="+45K" subTitle="System Health">
             <div slot="header" class="icon-info">
               <i class="nc-icon nc-favourite-28 text-primary"></i>
             </div>
@@ -84,15 +84,15 @@
             </template>
           </stats-card>
         </div>
-
       </div>
+
       <div class="row">
 
         <div class="col-md-4">
           <chart-card :chart-data="pieChart.data" chart-type="Pie">
             <template slot="header">
-              <h4 class="card-title">Email Statistics</h4>
-              <p class="card-category">Last Campaign Performance</p>
+              <h4 class="card-title">Packs per recipe</h4>
+              <p class="card-category">Distribution of packs produced w.r.t recipes</p>
             </template>
             <template slot="footer">
               <div class="legend">
@@ -109,11 +109,20 @@
         </div>
 
         <div class="col-md-8">
+          <PaginatedTables />
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <!-- Chart One -->
+        <div class="col-md-6">
           <chart-card :chart-data="lineChart.data"
                       :chart-options="lineChart.options"
                       :responsive-options="lineChart.responsiveOptions">
             <template slot="header">
-              <h4 class="card-title">Users Behavior</h4>
+              <h4 class="card-title">Packs Per Minute</h4>
               <p class="card-category">24 Hours performance</p>
             </template>
             <template slot="footer">
@@ -129,17 +138,38 @@
             </template>
           </chart-card>
         </div>
-      </div>
 
-      <div class="row">
-
+        <!-- Chart Two -->
         <div class="col-md-6">
 
-        <PaginatedTables />
+          <div id="pie_chart_parent" style="background-color: blue;">
+                <!-- <canvas id="div_line_pie_chart">
+                </canvas> -->
+          </div>
+          <!-- <chart-card :chart-data="lineChart.data"
+                      :chart-options="lineChart.options"
+                      :responsive-options="lineChart.responsiveOptions">
+            <template slot="header">
+              <h4 class="card-title">Batch Speed Per User</h4>
+              <p class="card-category">24 Hours performance</p>
+            </template>
+            <template slot="footer">
+              <div class="legend">
+                <i class="fa fa-circle text-info"></i> Open
+                <i class="fa fa-circle text-danger"></i> Click
+                <i class="fa fa-circle text-warning"></i> Click Second Time
+              </div>
+              <hr>
+              <div class="stats">
+                <i class="fa fa-history"></i> Updated 3 minutes ago
+              </div>
+            </template>
+          </chart-card> -->
         </div>
+
       </div>
 
-      <div class="row">
+      <!-- <div class="row">
         <div class="col-md-6">
           <chart-card
             :chart-data="barChart.data"
@@ -187,7 +217,7 @@
           </card>
 
         </div>
-      </div>
+      </div> -->
   </div>
 </template>
 <script>
@@ -196,6 +226,7 @@
   import Dropdown from '../../../components/Dropdown.vue'
   import { DatePicker, TimeSelect, Slider, Tag, Input, Button, Select, Option } from 'element-ui'
 import PaginatedTables from '../Tables/PaginatedTables.vue'
+import axios from 'axios'
 
   export default {
     components: {
@@ -211,7 +242,7 @@ import PaginatedTables from '../Tables/PaginatedTables.vue'
       [Select.name]: Select,
       StatsCard,
       Dropdown,
-        PaginatedTables
+      PaginatedTables
     },
     data () {
       return {
@@ -307,8 +338,31 @@ import PaginatedTables from '../Tables/PaginatedTables.vue'
           ]
         }
       }
+    },
+    methods: {
+        filter(query) {
+          console.log("In Filter function."+query);
+        },
+        dispatch(e) {
+          
+          console.log("Dispathc "+e);
+          this.search(e);
+        },
+        search(Line) {
+            axios.get('http://18.168.19.93:5000/search?q='+Line)//&sDate=01/08/2020&eDate=04/08/2020')
+                .then(response => {
+                  console.log("Good oye@@@@@@")
+                  console.log(response)
+                  this.data2 = response.data;
+                  return true
+            })
+        },
+        drawGraphs(){
+          console.log("Dispathc "+e);
+        }
     }
   }
+
 </script>
 <style>
 

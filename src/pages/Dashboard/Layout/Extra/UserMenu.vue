@@ -1,7 +1,7 @@
 <template>
   <div class="user">
     <div class="photo">
-      <img src="static/img/default-avatar.png" alt="avatar"/>
+      <img src="static/img/Usman1.png" alt="avatar"/>
     </div>
     <div class="info">
       <a data-toggle="collapse" :aria-expanded="!isClosed" @click.stop="toggleMenu" href="#">
@@ -50,7 +50,7 @@
     props: {
       title: {
         type: String,
-        default: 'Tania Andrew'
+        default: 'Muhammad Usman'
       }
     },
     data () {

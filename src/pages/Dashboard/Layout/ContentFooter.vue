@@ -10,9 +10,9 @@
       </nav>
       <div class="copyright">
         &copy; Coded with
-        <i class="fa fa-heart heart"></i> by
-        <a href="https://github.com/cristijora" target="_blank">Cristi Jora</a>.
-        Designed by <a href="https://www.creative-tim.com/?ref=pdf-vuejs" target="_blank" rel="noopener">Creative Tim</a>.
+        <i class="fa fa-heart heart"></i> by Usman
+        <!-- <a href="https://github.com/cristijora" target="_blank">Cristi Jora</a>.
+        Designed by <a href="https://www.creative-tim.com/?ref=pdf-vuejs" target="_blank" rel="noopener">Creative Tim</a>. -->
       </div>
     </div>
   </footer>

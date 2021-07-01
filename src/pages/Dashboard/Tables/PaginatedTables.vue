@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-md-12">
+    <!-- <div class="col-md-12">
       <h4 class="title">Custom table with pagination</h4>
       <p class="category">
         We combine <a href="http://element.eleme.io/#/en-US/component/quickstart" target="_blank" rel="noopener">Element-UI</a>
@@ -8,7 +8,7 @@
         which should provide a very good starting point to integrate tables in your application.
         Check out more functionalities at <a href="http://element.eleme.io/#/en-US/component/table" target="_blank">Element-UI table documentation</a>.
       </p>
-    </div>
+    </div> -->
 
     <div class="col-12">
       <card title="Paginated tables">

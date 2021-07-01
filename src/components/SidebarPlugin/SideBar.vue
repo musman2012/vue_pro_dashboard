@@ -62,7 +62,7 @@ function initScrollbar(className) {
     props: {
       title: {
         type: String,
-        default: 'Vue LBD PRO'
+        default: 'Data Connect PAL'
       },
       backgroundColor: {
         type: String,
