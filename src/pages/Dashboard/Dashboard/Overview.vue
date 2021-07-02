@@ -6,10 +6,11 @@
         <h5 class="title">Select Starting and Ending Date</h5>
         <fg-input>
           <el-date-picker
-            v-model="dateTimePicker"
-            type="datetimerange"
-            placeholder="Datetime picker here"
-            :picker-options="pickerOptions1"
+            v-model="value"
+            type="daterange"
+            start-placeholder="Start Date"
+            end-placeholder="End Date"
+            value-format = "yyyy-MM-dd"
           >
           </el-date-picker>
         </fg-input>
@@ -226,6 +227,7 @@ export default {
     return {
       editTooltip: "Edit Task",
       deleteTooltip: "Remove",
+      value: '',
       batchesData: [
           {
             batch_id: 1,
@@ -300,22 +302,50 @@ export default {
     },
     dispatch(e) {
       console.log("Dispathc " + e);
-      this.batchesData = [
-          {
-            batch_id: 3,
-            recipe: "Rakota Rice",
-            packs_produced: 2352,
-            end_time: "12/02/2999 12:23",
-            kpi: 0.6,
-          },
-          {
-            batch_id: 4,
-            recipe: "Nineroia Rice",
-            packs_produced: 23152,
-            end_time: "12/03/2999 12:23",
-            kpi: 0.3,
-          },
-        ];
+      console.log("Value of date time picker is "+this.value[0])
+      axios
+        .get("http://18.168.19.93:5000/search?q=" + e+"&sDate="+this.value[0]+"&eDate="+this.value[1])
+        .then((response) => {
+          var batch_tbl_data = [];
+          var pie_data = [];
+          var recipe_pack_count = {};
+          console.log("Good oye@@@@@@");
+          console.log(this.pieChart.data);
+          var temp_data = response.data;
+          temp_data.forEach(element => {
+            var source_data = element._source;
+            var entry = {
+              batch_id: source_data.Batch_ID,
+              recipe: source_data.Recipe,
+              packs_produced: source_data.Total_Packs,
+              end_time: source_data.TIMESTAMP,
+              kpi: source_data.KPI
+            };
+            if (entry.recipe in recipe_pack_count){
+                recipe_pack_count[entry.recipe] += entry.packs_produced;
+            }
+            else{
+                recipe_pack_count[entry.recipe] = entry.packs_produced;
+            }
+            batch_tbl_data.push(entry);
+            entry = {};
+          });
+          
+          console.log("PieChart Data");
+          // console.log(batch_tbl_data);
+          // console.log(this.pieChart.data);
+          this.batchesData = batch_tbl_data;
+          this.pieChart.data.labels = [];
+          this.pieChart.data.series = [];
+          Object.keys(recipe_pack_count).forEach(key => {
+            this.pieChart.data.labels.push(key);
+            this.pieChart.data.series.push(recipe_pack_count[key]);
+          });
+          console.log(this.pieChart.data);
+          // console.log("Batches Data");
+          // console.log(this.batchesData);
+          
+        });
      // this.search(e);
     },
     search(Line) {
@@ -323,7 +353,7 @@ export default {
         .get("http://18.168.19.93:5000/search?q=" + Line) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
           console.log("Good oye@@@@@@");
-          console.log(response);
+          
           this.data2 = response.data;
           return true;
         });

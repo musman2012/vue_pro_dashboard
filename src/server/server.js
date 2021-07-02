@@ -61,15 +61,15 @@ app.get('/search', function (req, res) {
                         match: {
                             FLAG: "END"
                         }
-                    }//,
-                    // {
-                    //     range: {
-                    //         "@timestamp": {
-                    //             gte: req.query['sDate'],
-                    //             lte: req.query['eDate']
-                    //         }
-                    //     }
-                    // }
+                    },
+                    {
+                        range: {
+                            "@timestamp": {
+                                gte: req.query['sDate'],
+                                lte: req.query['eDate']
+                            }
+                        }
+                    }
                 ]
             }
         }
