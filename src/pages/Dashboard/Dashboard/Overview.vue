@@ -115,7 +115,7 @@
     </div>
     <div class="row">
       <div class="col-md-8">
-        <chart-card
+        <!-- <chart-card
           :chart-data="lineChart.data"
           :chart-options="lineChart.options"
         >
@@ -134,7 +134,8 @@
               <i class="fa fa-history"></i> Updated 3 minutes ago
             </div>
           </template>
-        </chart-card>
+        </chart-card> -->
+        <div id="realTimeGraph"></div>
       </div>
     </div>
 
@@ -145,7 +146,7 @@
       
 
       <!-- Chart Two - To be used as backup -->
-      <div class="col-md-6">
+      <div class="col-md-12">
         <div id="pie_chart_parent" style="background-color: blue">
           <!-- <canvas id="div_line_pie_chart">
                 </canvas> -->
@@ -346,9 +347,12 @@ export default {
     };
   },
   mounted() {
-      let chart_js = document.createElement('script')
-      chart_js.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js')
-      document.head.appendChild(chart_js)
+      let chart_js = document.createElement('script');
+      let plotly = document.createElement('script');
+      chart_js.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js');
+      document.head.appendChild(chart_js);
+      plotly.setAttribute('src', 'https://cdn.plot.ly/plotly-latest.min.js');
+      document.head.appendChild(plotly);
   },
   methods: {
     filter(query) {
@@ -445,14 +449,56 @@ export default {
      // this.search(e);
     },
     drawRealTimeGraph(batchID){
+      window.batch_ppms = [];
+      window.batch_times = [];
         axios
         .get("http://18.168.19.93:5000/fetchBatchData?q=" + batchID) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
-          console.log("fetchBatch Data" + batchID);
-          
-          console.log(response.data);
-          
-        });
+         // window.batchData = response.data;
+                var jsoned_batch_data = JSON.parse(JSON.stringify(response.data))
+                console.log("JSONed Data");
+                console.log(jsoned_batch_data);
+                for (var j = 0; j < jsoned_batch_data.length; j++) {
+                    var fields = jsoned_batch_data[j]._source;
+                    //window.batch_ppms.push(fields.PPM[0].toString());
+                    window.batch_ppms[j] = fields.PPM.toString();
+                    var time_field = fields.TIMESTAMP;
+                    var tkns = time_field.split(" ");
+                    window.batch_times.push(tkns[1]);
+                }
+                var layout = {
+                    title: 'Realtime Batch Production Data - Batch ID::' + batchID,
+                    xaxis: {
+                        title: 'Time',
+                        titlefont: { family: 'Arial, sans-serif', size: 18, color: 'lightgrey' },
+                        showticklabels: true,
+                        tickangle: 'auto',
+                        tickfont: { family: 'Old Standard TT, serif', size: 14, color: 'black' },
+                        //exponentformat: 'e',
+                        showexponent: 'all'
+                    },
+                    yaxis: {
+                        title: 'Number of Packs',
+                        titlefont: { family: 'Arial, sans-serif', size: 18, color: 'lightgrey' },
+                        showticklabels: true,
+                        tickangle: 45,
+                        tickfont: { family: 'Old Standard TT, serif', size: 14, color: 'black' },
+                        exponentformat: 'e',
+                        showexponent: 'all'
+                    }
+                };
+                
+                var trace1 = {
+                    x: window.batch_times,// ['2020-10-04', '2021-11-04', '2023-12-04'],
+                    y: window.batch_ppms,// [90, 40, 60],
+                    type: 'scatter'
+                };
+
+                var data = [trace1];
+               // n_times = window.batch_times;
+                Plotly.newPlot('realTimeGraph', data, layout, { scrollZoom: true });
+
+            })
     },
     generateReport(batchID){
       console.log("Generate report for batch " + batchID);
