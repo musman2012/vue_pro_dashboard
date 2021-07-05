@@ -14,7 +14,6 @@
       </tr>
       </tbody>
     </table>
-    <div v-if="searchES()">{{data2}}</div>
   </div>
 </template>
 <script>
@@ -33,16 +32,6 @@
       },
       itemValue (item, column) {
         return item[column.toLowerCase()]
-      },
-      searchES() {
-            axios.get('http://18.168.19.93:5000/search?q=Line 3')//&sDate=01/08/2020&eDate=04/08/2020')
-                .then(response => {
-                  console.log("Good oye@@@@@@")
-                  console.log(response)
-                  this.data2 = response.data;
-                  return true
-            })
-            
       }
     }
   }

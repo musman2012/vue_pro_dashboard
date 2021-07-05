@@ -1,5 +1,5 @@
 <template>
-    <span>Welcome to <b>Vue LBD PRO</b> - a beautiful freebie for every web developer.</span>
+    <span>Welcome to <b>Data Connect Dashbaord</b> - diving into your data.</span>
 </template>
 <script>
   export default {

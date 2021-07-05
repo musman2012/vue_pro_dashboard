@@ -41,7 +41,8 @@ client.ping({ requestTimeout: 30000 }, function (error) {
 });
 app.get('/', function (req, res) {
     res.send("<h1>Hello</h1>")
-})
+});
+
 app.get('/search', function (req, res) {
     console.log("search reqs recvd");
     let body = {
@@ -84,8 +85,43 @@ app.get('/search', function (req, res) {
             res.send([]);
         });
 
-})
+});
+//fetchBatchData
+app.get('/fetchBatchData', function (req, res) {
+    console.log("search reqs recvd");
+    let body = {
+        size: 500,
+        from: 0,
+        query: {
+            // Recipe: req.query['q'],
+            // FLAG: 'END'
+            bool: {
+                must: [
+                    {
+                        match: {
+                            Batch_ID: req.query['q']
+                        }
+                    },
+                    {
+                        match: {
+                            FLAG: "SCALE"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    console.log(body);
+    client.search({ index: 'dev-mw-1', body: body, type: '_doc' })
+        .then(results => {
+            res.send(results.hits.hits);
+        })
+        .catch(err => {
+            console.log(err)
+            res.send([]);
+        });
 
+});
 
 app.listen(PORT, function () {
     console.log('Your node.js server is running on PORT: ', PORT);
