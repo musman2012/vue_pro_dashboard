@@ -86,28 +86,7 @@
     </div>
 
     <div class="row">
-      <!-- This is the code for piechart -->
-      <!-- <div class="col-md-4">
-        <chart-card :chart-data="pieChart.data" chart-type="Pie">
-          <template slot="header">
-            <h4 class="card-title">Packs per recipe</h4>
-            <p class="card-category">
-              Distribution of packs produced w.r.t recipes
-            </p>
-          </template>
-          <template slot="footer">
-            <div class="legend">
-              <i class="fa fa-circle text-info"></i> Open
-              <i class="fa fa-circle text-danger"></i> Bounce
-              <i class="fa fa-circle text-warning"></i> Unsubscribe
-            </div>
-            <hr />
-            <div class="stats">
-              <i class="fa fa-clock-o"></i> Campaign sent 2 days ago
-            </div>
-          </template>
-        </chart-card>
-      </div> -->
+      
       <div class="col-md-12" id="pie_chart_parent">
                 <!-- <canvas id="div_line_pie_chart">
                 </canvas> -->
@@ -115,26 +94,7 @@
     </div>
     <div class="row">
       <div class="col-md-8">
-        <!-- <chart-card
-          :chart-data="lineChart.data"
-          :chart-options="lineChart.options"
-        >
-          <template slot="header">
-            <h4 class="card-title">Packs Per Minute</h4>
-            <p class="card-category">24 Hours performance</p>
-          </template>
-          <template slot="footer">
-            <div class="legend">
-              <i class="fa fa-circle text-info"></i> Open
-              <i class="fa fa-circle text-danger"></i> Click
-              <i class="fa fa-circle text-warning"></i> Click Second Time
-            </div>
-            <hr />
-            <div class="stats">
-              <i class="fa fa-history"></i> Updated 3 minutes ago
-            </div>
-          </template>
-        </chart-card> -->
+       
         <div id="realTimeGraph"></div>
       </div>
     </div>
@@ -165,9 +125,7 @@
           <div class="table-responsive table-full-width">
             
             <el-table :data="batchesData">
-              <!-- <el-table-column type="index">
-
-              </el-table-column> -->
+              
               <el-table-column prop="batch_id"
                               label="Batch ID">
               </el-table-column>
@@ -199,26 +157,6 @@
                 </div>
               </el-table-column>
             </el-table>
-            
-            <!-- <el-table class="table-striped" :data="batchesData">
-              <el-table-column
-                label="Batch_ID"
-                property="batch_id"
-              ></el-table-column>
-              <el-table-column
-                label="Recipe"
-                property="recipe"
-              ></el-table-column>
-              <el-table-column
-                label="Packs_Produced"
-                property="packs_produced"
-              ></el-table-column>
-              <el-table-column
-                label="End_Time"
-                property="end_time"
-              ></el-table-column>
-              <el-table-column label="KPI" property="kpi"></el-table-column>
-            </el-table> -->
           </div>
         </card>
       </div>
@@ -300,41 +238,7 @@ export default {
           series: [40, 20, 40],
         },
       },
-      lineChart: {
-        data: {
-          labels: [
-            "9:00AM",
-            "12:00AM",
-            "3:00PM",
-            "6:00PM",
-            "9:00PM",
-            "12:00PM",
-            "3:00AM",
-            "6:00AM",
-          ],
-          series: [
-            [287, 385, 490, 492, 554, 586, 698, 695],
-            [67, 152, 143, 240, 287, 335, 435, 437],
-            [23, 113, 67, 108, 190, 239, 307, 308],
-          ],
-        },
-        options: {
-          low: 0,
-          high: 800,
-          showArea: false,
-          height: "245px",
-          axisX: {
-            showGrid: false,
-          },
-          lineSmooth: true,
-          showLine: true,
-          showPoint: true,
-          fullWidth: true,
-          chartPadding: {
-            right: 50,
-          },
-        },
-      },
+      
       line_names: {
         simple: "",
         fetched_lines: [
@@ -430,20 +334,10 @@ export default {
           });
           window.counter += 1;
           console.log("PieChart Data");
-          // console.log(batch_tbl_data);
-          // console.log(this.pieChart.data);
+          
           this.batchesData = batch_tbl_data;
 
-          // this.pieChart.data.labels = [];
-          // this.pieChart.data.series = [];
-          // Object.keys(recipe_pack_count).forEach(key => {
-          //   this.pieChart.data.labels.push(key);
-          //   this.pieChart.data.series.push(recipe_pack_count[key]);
-          // });
-
           console.log(this.pieChart.data);
-          // console.log("Batches Data");
-          // console.log(this.batchesData);
           
         });
      // this.search(e);

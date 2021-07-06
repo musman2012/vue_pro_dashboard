@@ -86,7 +86,7 @@ extend("min", min);
     methods: {
       submit() {
         // alert("Form has been submitted!");
-        // here we can use DB connect to fetch user creds and validate before logging in
+        // TODO: here we can use DB connect to fetch user creds and validate before logging in
         this.$router.push({ name: 'Overview' })
       },
       toggleNavbar () {
