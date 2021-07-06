@@ -548,9 +548,15 @@
   .table-full-width{
     margin-left: -15px;
     margin-right: -15px;
+    // overflow-y: scroll;
+    // height: 600px;
   }
   .table-responsive{
-    overflow: visible;
+   // overflow: visible;
+   overflow: scroll;
+   height: 600px;
+   -ms-overflow-style: -ms-autohiding-scrollbar;
+   -webkit-overflow-scrolling: touch;
   }
 
 }

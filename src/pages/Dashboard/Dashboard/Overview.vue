@@ -99,8 +99,6 @@
       </div>
     </div>
 
-    
-
     <div class="row">
       <!-- Chart One -->
       
@@ -122,7 +120,7 @@
           <div slot="header">
             <h4 class="card-title">Batches Data table</h4>
           </div>
-          <div class="table-responsive table-full-width">
+          <div class="table-responsive table-full-width ">
             
             <el-table :data="batchesData">
               
