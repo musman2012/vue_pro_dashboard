@@ -165,9 +165,9 @@
           <div class="table-responsive table-full-width">
             
             <el-table :data="batchesData">
-              <el-table-column type="index">
+              <!-- <el-table-column type="index">
 
-              </el-table-column>
+              </el-table-column> -->
               <el-table-column prop="batch_id"
                               label="Batch ID">
               </el-table-column>
@@ -451,8 +451,10 @@ export default {
     drawRealTimeGraph(batchID){
       window.batch_ppms = [];
       window.batch_times = [];
+      var scale_val = 1;      // this scale_val can be added in a loop so that data for every scale can be fetched and plotted on the same graph
+      // get Scale_QT for this Batch and this loop will run for Scale_QT times
         axios
-        .get("http://18.168.19.93:5000/fetchBatchData?q=" + batchID) //&sDate=01/08/2020&eDate=04/08/2020')
+        .get("http://18.168.19.93:5000/fetchBatchData?q=" + batchID+"&scale="+scale_val.toString()) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
          // window.batchData = response.data;
                 var jsoned_batch_data = JSON.parse(JSON.stringify(response.data))

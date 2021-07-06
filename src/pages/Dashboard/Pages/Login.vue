@@ -37,11 +37,11 @@
                                v-model="password">
                     </fg-input>
                   </ValidationProvider>
-                  <fg-input>
+                  <!-- <fg-input>
                     <l-checkbox v-model="subscribe">
                       Subscribe to newsletter
                     </l-checkbox>
-                  </fg-input>
+                  </fg-input> -->
                 </div>
                 <div class="text-center">
                   <button type="submit" class="btn btn-fill btn-info btn-round btn-wd ">Login</button>
@@ -85,7 +85,9 @@ extend("min", min);
     },
     methods: {
       submit() {
-        alert("Form has been submitted!");
+        // alert("Form has been submitted!");
+        // here we can use DB connect to fetch user creds and validate before logging in
+        this.$router.push({ name: 'Overview' })
       },
       toggleNavbar () {
         document.body.classList.toggle('nav-open')
