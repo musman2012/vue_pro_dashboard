@@ -10,7 +10,7 @@
             type="daterange"
             start-placeholder="Start Date"
             end-placeholder="End Date"
-            value-format = "yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
           >
           </el-date-picker>
         </fg-input>
@@ -36,8 +36,6 @@
           </el-option>
         </el-select>
       </div>
-
-      
     </div>
     <div class="row">
       <div class="col-xl-3 col-md-6">
@@ -86,32 +84,29 @@
     </div>
 
     <div class="row">
-      
       <div class="col-md-12" id="pie_chart_parent">
-                <!-- <canvas id="div_line_pie_chart">
+        <!-- <canvas id="div_line_pie_chart">
                 </canvas> -->
       </div>
     </div>
     <div class="row">
-      <div class="col-md-8">
-       
+      <div class="col-md-8" style="margin: 70px">
         <div id="realTimeGraph"></div>
       </div>
     </div>
 
     <div class="row">
       <!-- Chart One -->
-      
 
       <!-- Chart Two - To be used as backup -->
       <div class="col-md-12">
-        <div id="pie_chart_parent" style="background-color: blue">
-          <!-- <canvas id="div_line_pie_chart">
-                </canvas> -->
-        </div>
+        <!-- <div id="pie_chart_parent" style="background-color: blue">
+          <canvas id="div_line_pie_chart">
+                </canvas> 
+        </div>-->
       </div>
     </div>
- 
+
     <!-- change data on Dropdown select and see if graphs/tables are updated -->
     <!-- we can use v-bind:key to batch id -- Better to use a Batches Data attribute to use everywhere -->
     <div class="row">
@@ -120,32 +115,33 @@
           <div slot="header">
             <h4 class="card-title">Batches Data table</h4>
           </div>
-          <div class="table-responsive table-full-width ">
-            
+          <div class="table-responsive table-full-width">
             <el-table :data="batchesData">
-              
-              <el-table-column prop="batch_id"
-                              label="Batch ID">
+              <el-table-column prop="batch_id" label="Batch ID">
               </el-table-column>
-              <el-table-column prop="recipe"
-                              label="Recipe">
+              <el-table-column prop="recipe" label="Recipe"> </el-table-column>
+              <el-table-column prop="packs_produced" label="Packs Produced">
               </el-table-column>
-              <el-table-column prop="packs_produced"
-                              label="Packs Produced">
-              </el-table-column>
-              <el-table-column label="End Time"
+              <el-table-column
+                label="End Time"
                 property="end_time"
               ></el-table-column>
               <el-table-column label="KPI" property="kpi"></el-table-column>
-              <el-table-column
-                label="Actions">
+              <el-table-column label="Actions">
                 <div class="td-actions" slot-scope="props">
-                  <a v-tooltip.top-center="'View Graph'" class="btn btn-info btn-link btn-xs" href="#"
-                    @click="drawRealTimeGraph(props.row.batch_id)">
+                  <a
+                    v-tooltip.top-center="'View Graph'"
+                    class="btn btn-info btn-link btn-xs"
+                    href="#"
+                    @click="drawRealTimeGraph(props.row.batch_id)"
+                  >
                     <i class="fa fa-user"></i>
                   </a>
-                  <a v-tooltip.top-center="'Generate Report'" class="btn btn-warning btn-link btn-xs"
-                    @click="generateReport(props.row.batch_id)">
+                  <a
+                    v-tooltip.top-center="'Generate Report'"
+                    class="btn btn-warning btn-link btn-xs"
+                    @click="generateReport(props.row.batch_id)"
+                  >
                     <i class="fa fa-edit"></i>
                   </a>
                   <!-- <a v-tooltip.top-center="'Delete'" class="btn btn-danger btn-link btn-xs"
@@ -184,11 +180,12 @@ import {
   Button,
   Select,
   Option,
-  Table, 
-  TableColumn
+  Table,
+  TableColumn,
 } from "element-ui";
 //import PaginatedTables from "../Tables/PaginatedTables.vue";
 import axios from "axios";
+import { jsPDF } from "jspdf";
 
 export default {
   components: {
@@ -204,7 +201,7 @@ export default {
     [Select.name]: Select,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
-    StatsCard
+    StatsCard,
   },
   data() {
     return {
@@ -212,31 +209,31 @@ export default {
       deleteTooltip: "Remove",
       totalPacks: "140",
       totalCost: "$ 9,999",
-      value: '',
+      value: "",
       batches_dict: {},
       batchesData: [
-          {
-            batch_id: 1,
-            recipe: "Dakota Rice",
-            packs_produced: 2352,
-            end_time: "12/02/2999 12:23",
-            kpi: 0.6,
-          },
-          {
-            batch_id: 2,
-            recipe: "Mineroia Rice",
-            packs_produced: 23152,
-            end_time: "12/03/2999 12:23",
-            kpi: 0.3,
-          },
-        ],
+        {
+          batch_id: 1,
+          recipe: "Dakota Rice",
+          packs_produced: 2352,
+          end_time: "12/02/2999 12:23",
+          kpi: 0.6,
+        },
+        {
+          batch_id: 2,
+          recipe: "Mineroia Rice",
+          packs_produced: 23152,
+          end_time: "12/03/2999 12:23",
+          kpi: 0.3,
+        },
+      ],
       pieChart: {
         data: {
           labels: ["40%", "20%", "40%"],
           series: [40, 20, 40],
         },
       },
-      
+
       line_names: {
         simple: "",
         fetched_lines: [
@@ -249,12 +246,15 @@ export default {
     };
   },
   mounted() {
-      let chart_js = document.createElement('script');
-      let plotly = document.createElement('script');
-      chart_js.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js');
-      document.head.appendChild(chart_js);
-      plotly.setAttribute('src', 'https://cdn.plot.ly/plotly-latest.min.js');
-      document.head.appendChild(plotly);
+    let chart_js = document.createElement("script");
+    let plotly = document.createElement("script");
+    chart_js.setAttribute(
+      "src",
+      "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"
+    );
+    document.head.appendChild(chart_js);
+    plotly.setAttribute("src", "https://cdn.plot.ly/plotly-latest.min.js");
+    document.head.appendChild(plotly);
   },
   methods: {
     filter(query) {
@@ -264,10 +264,28 @@ export default {
       console.log("Dispathc " + e);
       console.log("Value of date time picker is " + this.value[0]);
       var bg_colors = [];
-      var colors = ['#3e818e', '#444f93', '#17406e', '#1a5ba6', '#fcd364', '#fef9c0', '#429476', '#db7556','#d2d38e','#030508']
+      var colors = [
+        "#3e818e",
+        "#444f93",
+        "#17406e",
+        "#1a5ba6",
+        "#fcd364",
+        "#fef9c0",
+        "#429476",
+        "#db7556",
+        "#d2d38e",
+        "#030508",
+      ];
 
       axios
-        .get("http://18.168.19.93:5000/search?q=" + e+"&sDate="+this.value[0]+"&eDate="+this.value[1])
+        .get(
+          "http://18.168.19.93:5000/search?q=" +
+            e +
+            "&sDate=" +
+            this.value[0] +
+            "&eDate=" +
+            this.value[1]
+        )
         .then((response) => {
           var batch_tbl_data = [];
           var pie_data = [];
@@ -276,9 +294,9 @@ export default {
           var temp_cost = 0;
           //this.totalPacks = 0;
           console.log("Good oye@@@@@@");
-         // console.log(this.pieChart.data);
+          // console.log(this.pieChart.data);
           var temp_data = response.data;
-          temp_data.forEach(element => {
+          temp_data.forEach((element) => {
             // MAKE THE WHOLE DATA ACCESSIBLE THROUGH BATCH ID
             // THIS NEW DATASET VAR WILL BE USED TO 1- DRAW GRAPH 2- GENERATE REPORT
             var source_data = element._source;
@@ -287,123 +305,188 @@ export default {
               recipe: source_data.Recipe,
               packs_produced: source_data.Total_Packs,
               end_time: source_data.TIMESTAMP,
-              kpi: source_data.KPI
+              kpi: source_data.KPI,
             };
             temp_packs += entry.packs_produced;
             temp_cost += source_data.Pack_Cost;
-            if (entry.recipe in recipe_pack_count){
-                recipe_pack_count[entry.recipe] += entry.packs_produced;
-            }
-            else{
-                recipe_pack_count[entry.recipe] = entry.packs_produced;
+            if (entry.recipe in recipe_pack_count) {
+              recipe_pack_count[entry.recipe] += entry.packs_produced;
+            } else {
+              recipe_pack_count[entry.recipe] = entry.packs_produced;
             }
             batch_tbl_data.push(entry);
             entry = {};
           });
-          var avg_cost_bactch = temp_cost/temp_data.length;
-          avg_cost_bactch = avg_cost_bactch.toFixed(2)
+          var avg_cost_bactch = temp_cost / temp_data.length;
+          avg_cost_bactch = avg_cost_bactch.toFixed(2);
           this.totalPacks = temp_packs.toString();
           this.totalCost = avg_cost_bactch.toString();
-          var stage = document.createElement('canvas');
-          stage.setAttribute('id', 'canvas' + window.counter);
+          var stage = document.createElement("canvas");
+          stage.setAttribute("id", "canvas" + window.counter);
           document.getElementById("pie_chart_parent").appendChild(stage);
           var myobj = stage.getContext("2d");
-          if (window.counter > 0){
-              document.getElementById('canvas' + (counter -1 )).remove();
+          if (window.counter > 0) {
+            document.getElementById("canvas" + (counter - 1)).remove();
           }
-          console.log("RCP count keys:")
+          console.log("RCP count keys:");
           for (var c = 0; c < Object.keys(recipe_pack_count).length; c++) {
-                    bg_colors.push(colors[c]);
+            bg_colors.push(colors[c]);
           }
           console.log(Object.keys(recipe_pack_count));
           console.log(Object.values(recipe_pack_count));
-          window.myChart = new Chart(myobj, { type: 'pie', data: 
-                    {labels: Object.keys(recipe_pack_count), datasets: [{
-                        data: Object.values(recipe_pack_count),// rcp_vals,
-                        backgroundColor: bg_colors
-                    }]}
-                    , 
-                    options: {
-                       // responsive: true,
-                        title: {
-                        display: true,
-                        text: "World Wide Wine Production 2018"
-                    }} 
+          const data = {
+            labels: Object.keys(recipe_pack_count),
+            datasets: [
+              {
+                label: "Production w.r.t Recipes",
+                data: Object.values(recipe_pack_count),
+                backgroundColor: bg_colors,
+                hoverOffset: 4,
+                radius: 20,
+              },
+            ],
+          };
+          var myChart = new Chart(myobj, {
+            type: "pie",
+            data: data,
+            // {labels: Object.keys(recipe_pack_count), datasets: [{
+            //     data: Object.values(recipe_pack_count),// rcp_vals,
+            //     backgroundColor: bg_colors,
+            //     radius: 20
+            // }]}
+            // ,
+            // options: {
+            //    // responsive: true,
+            //     title: {
+            //     display: true,
+            //     text: "Production w.r.t Recipes",
+            //     //maintainAspectRatio: false,
+            //    // responsive: true
+            // }}
           });
+          myChart.resize(200, 200);
           window.counter += 1;
           console.log("PieChart Data");
-          
+
           this.batchesData = batch_tbl_data;
 
           console.log(this.pieChart.data);
-          
         });
-     // this.search(e);
+      // this.search(e);
     },
-    drawRealTimeGraph(batchID){
+    drawRealTimeGraph(batchID) {
       window.batch_ppms = [];
       window.batch_times = [];
-      var scale_val = 1;      // this scale_val can be added in a loop so that data for every scale can be fetched and plotted on the same graph
+      var scale_val = 1; // TODO: this scale_val can be added in a loop so that data for every scale can be fetched and plotted on the same graph
       // get Scale_QT for this Batch and this loop will run for Scale_QT times
-        axios
-        .get("http://18.168.19.93:5000/fetchBatchData?q=" + batchID+"&scale="+scale_val.toString()) //&sDate=01/08/2020&eDate=04/08/2020')
+      axios
+        .get(
+          "http://18.168.19.93:5000/fetchBatchData?q=" +
+            batchID +
+            "&scale=" +
+            scale_val.toString()
+        ) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
-         // window.batchData = response.data;
-                var jsoned_batch_data = JSON.parse(JSON.stringify(response.data))
-                console.log("JSONed Data");
-                console.log(jsoned_batch_data);
-                for (var j = 0; j < jsoned_batch_data.length; j++) {
-                    var fields = jsoned_batch_data[j]._source;
-                    //window.batch_ppms.push(fields.PPM[0].toString());
-                    window.batch_ppms[j] = fields.PPM.toString();
-                    var time_field = fields.TIMESTAMP;
-                    var tkns = time_field.split(" ");
-                    window.batch_times.push(tkns[1]);
-                }
-                var layout = {
-                    title: 'Realtime Batch Production Data - Batch ID::' + batchID,
-                    xaxis: {
-                        title: 'Time',
-                        titlefont: { family: 'Arial, sans-serif', size: 18, color: 'lightgrey' },
-                        showticklabels: true,
-                        tickangle: 'auto',
-                        tickfont: { family: 'Old Standard TT, serif', size: 14, color: 'black' },
-                        //exponentformat: 'e',
-                        showexponent: 'all'
-                    },
-                    yaxis: {
-                        title: 'Number of Packs',
-                        titlefont: { family: 'Arial, sans-serif', size: 18, color: 'lightgrey' },
-                        showticklabels: true,
-                        tickangle: 45,
-                        tickfont: { family: 'Old Standard TT, serif', size: 14, color: 'black' },
-                        exponentformat: 'e',
-                        showexponent: 'all'
-                    }
-                };
-                
-                var trace1 = {
-                    x: window.batch_times,// ['2020-10-04', '2021-11-04', '2023-12-04'],
-                    y: window.batch_ppms,// [90, 40, 60],
-                    type: 'scatter'
-                };
+          // window.batchData = response.data;
+          var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
+          console.log("JSONed Data");
+          console.log(jsoned_batch_data);
+          for (var j = 0; j < jsoned_batch_data.length; j++) {
+            var fields = jsoned_batch_data[j]._source;
+            //window.batch_ppms.push(fields.PPM[0].toString());
+            window.batch_ppms[j] = fields.PPM.toString();
+            var time_field = fields.TIMESTAMP;
+            var tkns = time_field.split(" ");
+            window.batch_times.push(tkns[1]);
+          }
+          var layout = {
+            title: "Realtime Batch Production Data - Batch ID::" + batchID,
+            xaxis: {
+              title: "Time",
+              titlefont: {
+                family: "Arial, sans-serif",
+                size: 13,
+                color: "lightgrey",
+              },
+              showticklabels: true,
+              tickangle: 45,
+              tickfont: {
+                family: "Old Standard TT, serif",
+                size: 11,
+                color: "black",
+              },
+              //exponentformat: 'e',
+              showexponent: "all",
+            },
+            yaxis: {
+              title: "Number of Packs",
+              titlefont: {
+                family: "Arial, sans-serif",
+                size: 13,
+                color: "lightgrey",
+              },
+              showticklabels: true,
+              tickangle: 45,
+              tickfont: {
+                family: "Old Standard TT, serif",
+                size: 11,
+                color: "black",
+              },
+              exponentformat: "e",
+              showexponent: "all",
+            },
+          };
 
-                var data = [trace1];
-               // n_times = window.batch_times;
-                Plotly.newPlot('realTimeGraph', data, layout, { scrollZoom: true });
+          var trace1 = {
+            x: window.batch_times, // ['2020-10-04', '2021-11-04', '2023-12-04'],
+            y: window.batch_ppms, // [90, 40, 60],
+            type: "scatter",
+          };
 
-            })
+          var data = [trace1];
+          // n_times = window.batch_times;
+          Plotly.newPlot("realTimeGraph", data, layout, { scrollZoom: true });
+        });
     },
-    generateReport(batchID){
+    generateReport(batchID) {
       console.log("Generate report for batch " + batchID);
+      axios
+        .get(
+          "http://18.168.19.93:5000/fetchBatchReportData?q=" +
+            batchID) //&sDate=01/08/2020&eDate=04/08/2020')
+        .then((response) => {
+          // window.batchData = response.data;
+          var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
+          var batch_end_data = jsoned_batch_data[0]._source;
+          const doc = new jsPDF();
+          this.write_report_content(doc, batch_end_data);
+          console.log();
+          doc.save("a4.pdf");
+        });
+
       console.log(batchID);
+    },
+    write_report_content(doc_obj, data) {
+          // .text("text to write", text_x, text_y)
+          var row_1 = 50; var row_2 = row_1 + 10; var row_3 = row_2 + 10;
+          doc_obj.addImage("static/img/MiWeigh_Large.png", 'PNG', 10, 10, 50, 25);
+          doc_obj.text("Report for Batch: " + data.Batch_ID, 10, row_1);
+          doc_obj.text(" KPI: " + data.KPI, 100, row_1);
+          doc_obj.text("Batch Runtime: " + data.Run_Time, 10, row_2);
+          doc_obj.text(" Recipe: " + data.Recipe, 100, row_2);
+          doc_obj.setDrawColor(0);
+          doc_obj.setFillColor(255, 0, 0);
+          // rect(starting_x, starting_y, width, height, 'F')
+          doc_obj.rect(10, row_3, 75, 7, "F"); // filled red square
+
+          return doc_obj;
     },
     search(Line) {
       axios
         .get("http://18.168.19.93:5000/search?q=" + Line) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
           console.log("Good oye@@@@@@");
-          
+
           this.data2 = response.data;
           return true;
         });
