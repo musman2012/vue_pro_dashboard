@@ -349,20 +349,6 @@ export default {
           var myChart = new Chart(myobj, {
             type: "pie",
             data: data,
-            // {labels: Object.keys(recipe_pack_count), datasets: [{
-            //     data: Object.values(recipe_pack_count),// rcp_vals,
-            //     backgroundColor: bg_colors,
-            //     radius: 20
-            // }]}
-            // ,
-            // options: {
-            //    // responsive: true,
-            //     title: {
-            //     display: true,
-            //     text: "Production w.r.t Recipes",
-            //     //maintainAspectRatio: false,
-            //    // responsive: true
-            // }}
           });
           myChart.resize(200, 200);
           window.counter += 1;
@@ -458,9 +444,9 @@ export default {
           // window.batchData = response.data;
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
           var batch_end_data = jsoned_batch_data[0]._source;
+          console.log(batch_end_data);
           const doc = new jsPDF();
           this.write_report_content(doc, batch_end_data);
-          console.log();
           doc.save("a4.pdf");
         });
 
@@ -469,11 +455,32 @@ export default {
     write_report_content(doc_obj, data) {
           // .text("text to write", text_x, text_y)
           var row_1 = 50; var row_2 = row_1 + 10; var row_3 = row_2 + 10;
-          doc_obj.addImage("static/img/MiWeigh_Large.png", 'PNG', 10, 10, 50, 25);
-          doc_obj.text("Report for Batch: " + data.Batch_ID, 10, row_1);
-          doc_obj.text(" KPI: " + data.KPI, 100, row_1);
-          doc_obj.text("Batch Runtime: " + data.Run_Time, 10, row_2);
-          doc_obj.text(" Recipe: " + data.Recipe, 100, row_2);
+          var col_1 = 10; var col_2 = 100;
+          var h_line_size = 200;
+          doc_obj.setLineWidth(0.35);
+          doc_obj.line(10, 10, h_line_size, 10);
+          doc_obj.addImage("static/img/MiWeigh_Large.png", 'PNG', 10, 10, 40, 20);
+          // Block one in report
+          doc_obj.line(10, 30, h_line_size, 30);
+          doc_obj.text("Report for Batch: " + data.Batch_ID, col_1, row_1);
+          doc_obj.text(" KPI: " + data.KPI, col_2, row_1);
+          doc_obj.text("Date & Time: " + data.TIMESTAMP, col_1, row_2);
+          doc_obj.text(" Recipe: " + data.Recipe, col_2, row_2);
+          
+          // Block two in report
+          doc_obj.text("Batch Runtime: " + data.Run_Time, col_1, row_3 + 20);
+          doc_obj.text("Total Packs Produced: " + data.Total_Packs, col_2, row_3 + 20);
+          doc_obj.text("Cost Per Pack: " + data.Pack_Cost, col_1, row_3 + 30);
+          doc_obj.text("End Line Leader: " + data.Line_Leader, col_2, row_3 + 30);
+
+          // Block three in report
+          doc_obj.text("Average Speed: " + data.Avg_Speed, col_1, row_3 + 40);
+          doc_obj.text("Average Weight: " + data.Avg_Wght, col_2, row_3 + 40);
+          doc_obj.text("Average T1: " + data.AvT1, col_1, row_3 + 50);
+          doc_obj.text("Labour Cost: " + data.Lbr_Cost, col_2, row_3 + 50);
+
+          doc_obj.line(10, 130, h_line_size, 130);
+
           doc_obj.setDrawColor(0);
           doc_obj.setFillColor(255, 0, 0);
           // rect(starting_x, starting_y, width, height, 'F')
