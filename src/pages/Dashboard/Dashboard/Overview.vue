@@ -437,56 +437,103 @@ export default {
     generateReport(batchID) {
       console.log("Generate report for batch " + batchID);
       axios
-        .get(
-          "http://18.168.19.93:5000/fetchBatchReportData?q=" +
-            batchID) //&sDate=01/08/2020&eDate=04/08/2020')
+        .get("http://18.168.19.93:5000/fetchBatchReportData?q=" + batchID) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
           // window.batchData = response.data;
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
           var batch_end_data = jsoned_batch_data[0]._source;
           console.log(batch_end_data);
-          const doc = new jsPDF();
+          var doc = new jsPDF();
+          doc.setFont("times");
+          // doc.setFont('Helvetica');
           this.write_report_content(doc, batch_end_data);
           doc.save("a4.pdf");
         });
 
       console.log(batchID);
     },
+    addRow(table, qty, name, desc, price){
+      var tr = table.row()
+      tr.cell(qty.toString())
+      tr.cell('pc.')
+
+      var article = tr.cell().text()
+      article.add(name, { font: fonts.HelveticaBold })
+            .br()
+            .add(desc, { fontSize: 11, textAlign: 'justify' })
+
+      tr.cell(price.toFixed(2) + ' €', { textAlign: 'right' })
+      tr.cell((price * qty).toFixed(2) + ' €', { textAlign: 'right' })
+    },
     write_report_content(doc_obj, data) {
-          // .text("text to write", text_x, text_y)
-          var row_1 = 50; var row_2 = row_1 + 10; var row_3 = row_2 + 10;
-          var col_1 = 10; var col_2 = 100;
-          var h_line_size = 200;
-          doc_obj.setLineWidth(0.35);
-          doc_obj.line(10, 10, h_line_size, 10);
-          doc_obj.addImage("static/img/MiWeigh_Large.png", 'PNG', 10, 10, 40, 20);
-          // Block one in report
-          doc_obj.line(10, 30, h_line_size, 30);
-          doc_obj.text("Report for Batch: " + data.Batch_ID, col_1, row_1);
-          doc_obj.text(" KPI: " + data.KPI, col_2, row_1);
-          doc_obj.text("Date & Time: " + data.TIMESTAMP, col_1, row_2);
-          doc_obj.text(" Recipe: " + data.Recipe, col_2, row_2);
-          
-          // Block two in report
-          doc_obj.text("Batch Runtime: " + data.Run_Time, col_1, row_3 + 20);
-          doc_obj.text("Total Packs Produced: " + data.Total_Packs, col_2, row_3 + 20);
-          doc_obj.text("Cost Per Pack: " + data.Pack_Cost, col_1, row_3 + 30);
-          doc_obj.text("End Line Leader: " + data.Line_Leader, col_2, row_3 + 30);
+      // .text("text to write", text_x, text_y)
+      // var unit = 2;
+      // var table = doc_obj
+      //   .table({ widths: [1.5*unit, 1.5*unit, null, 2*unit, 2.5*unit],
+      //   borderHorizontalWidths: function(i) { return i < 2 ? 1 : 0.1 },
+      //   padding: 5 });
 
-          // Block three in report
-          doc_obj.text("Average Speed: " + data.Avg_Speed, col_1, row_3 + 40);
-          doc_obj.text("Average Weight: " + data.Avg_Wght, col_2, row_3 + 40);
-          doc_obj.text("Average T1: " + data.AvT1, col_1, row_3 + 50);
-          doc_obj.text("Labour Cost: " + data.Lbr_Cost, col_2, row_3 + 50);
+      //   var tr = table.header({ font: fonts.HelveticaBold, borderBottomWidth: 1.5 })
+      //               tr.cell('#')
+      //               tr.cell('Unit')
+      //               tr.cell('Subject')
+      //               tr.cell('Price', { textAlign: 'right' })
+      //               tr.cell('Total', { textAlign: 'right' });
 
-          doc_obj.line(10, 130, h_line_size, 130);
+      // this.addRow(table, 2, 'Article A', lorem, 500)
+      // this.addRow(table, 1, 'Article B', lorem, 250)
+      // header.cell().image("static/img/MiWeigh_Large.png", { height: 2 * unit });
+      // header
+      //   .cell()
+      //   .text({ textAlign: "right" })
+      //   .add(
+      //     "A Portable Document Format (PDF) generation library targeting both the server- and client-side."
+      //   );
+      var row_1 = 50;
+      var row_2 = row_1 + 10;
+      var row_3 = row_2 + 10;
+      var col_1 = 10;
+      var col_2 = 100;
+      var h_line_size = 200;
+      doc_obj.setLineWidth(0.35);
+      doc_obj.line(10, 10, h_line_size, 10);
+      doc_obj.addImage("static/img/MiWeigh_Large.png", "PNG", 10, 10, 40, 20);
+      doc_obj.setTextColor(100,140,80);
+      doc_obj.setFontSize(30);
+      doc_obj.text('Batch Report', 80, 20);
+      // Block one in report
+      doc_obj.line(10, 30, h_line_size, 30);
+      doc_obj.setFontSize(14);
+      doc_obj.setTextColor(0,0,0);
+      doc_obj.text("Report for Batch: " + data.Batch_ID, col_1, row_1);
+      doc_obj.text(" KPI: " + data.KPI, col_2, row_1);
+      doc_obj.text("Date & Time: " + data.TIMESTAMP, col_1, row_2);
+      doc_obj.text(" Recipe: " + data.Recipe, col_2, row_2);
 
-          doc_obj.setDrawColor(0);
-          doc_obj.setFillColor(255, 0, 0);
-          // rect(starting_x, starting_y, width, height, 'F')
-          doc_obj.rect(10, row_3, 75, 7, "F"); // filled red square
+      // Block two in report
+      doc_obj.text("Batch Runtime: " + data.Run_Time, col_1, row_3 + 20);
+      doc_obj.text(
+        "Total Packs Produced: " + data.Total_Packs,
+        col_2,
+        row_3 + 20
+      );
+      doc_obj.text("Cost Per Pack: " + data.Pack_Cost, col_1, row_3 + 30);
+      doc_obj.text("End Line Leader: " + data.Line_Leader, col_2, row_3 + 30);
 
-          return doc_obj;
+      // Block three in report
+      doc_obj.text("Average Speed: " + data.Avg_Speed, col_1, row_3 + 40);
+      doc_obj.text("Average Weight: " + data.Avg_Wght, col_2, row_3 + 40);
+      doc_obj.text("Average T1: " + data.AvT1, col_1, row_3 + 50);
+      doc_obj.text("Labour Cost: " + data.Lbr_Cost, col_2, row_3 + 50);
+
+      doc_obj.line(10, 130, h_line_size, 130);
+
+      doc_obj.setDrawColor(0);
+      doc_obj.setFillColor(255, 0, 0);
+      // rect(starting_x, starting_y, width, height, 'F')
+      doc_obj.rect(10, row_3, 75, 7, "F"); // filled red square
+
+      return doc_obj;
     },
     search(Line) {
       axios
