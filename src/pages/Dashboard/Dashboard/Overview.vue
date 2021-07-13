@@ -186,6 +186,7 @@ import {
 //import PaginatedTables from "../Tables/PaginatedTables.vue";
 import axios from "axios";
 import { jsPDF } from "jspdf";
+import 'jspdf-autotable';
 
 export default {
   components: {
@@ -465,6 +466,11 @@ export default {
       tr.cell(price.toFixed(2) + ' €', { textAlign: 'right' })
       tr.cell((price * qty).toFixed(2) + ' €', { textAlign: 'right' })
     },
+    add_report_row(doc_obj, row, text_1, num_1, text_2, num_2) {
+        var col_1 = 10; var col_2 = 100;
+        doc_obj.text(text_1 + num_1, col_1, row);
+        doc_obj.text(text_2 + num_2, col_2, row);
+    },
     write_report_content(doc_obj, data) {
       // .text("text to write", text_x, text_y)
       // var unit = 2;
@@ -489,12 +495,19 @@ export default {
       //   .add(
       //     "A Portable Document Format (PDF) generation library targeting both the server- and client-side."
       //   );
-      var row_1 = 50;
+      let l_yellow = 'FFFFCC', l_orange = 'FFE5CC', l_gray = 'E0E0E0', l_blue = 'CCE5FF';
+      
+      var row_1 = 40;
       var row_2 = row_1 + 10;
       var row_3 = row_2 + 10;
+      var tbl_row = row_3 + 70; var tbl_width = 100;
+      var bar_chart_col = 115; var bar_chart_row = tbl_row + 13;
+
       var col_1 = 10;
       var col_2 = 100;
       var h_line_size = 200;
+      var rect_width = 200; var rect_height = 10 * 2;
+      
       doc_obj.setLineWidth(0.35);
       doc_obj.line(10, 10, h_line_size, 10);
       doc_obj.addImage("static/img/MiWeigh_Large.png", "PNG", 10, 10, 40, 20);
@@ -503,35 +516,47 @@ export default {
       doc_obj.text('Batch Report', 80, 20);
       // Block one in report
       doc_obj.line(10, 30, h_line_size, 30);
-      doc_obj.setFontSize(14);
+      doc_obj.setFontSize(11);
       doc_obj.setTextColor(0,0,0);
-      doc_obj.text("Report for Batch: " + data.Batch_ID, col_1, row_1);
-      doc_obj.text(" KPI: " + data.KPI, col_2, row_1);
-      doc_obj.text("Date & Time: " + data.TIMESTAMP, col_1, row_2);
-      doc_obj.text(" Recipe: " + data.Recipe, col_2, row_2);
+      doc_obj.setFillColor(l_gray);
+      
+      // block one rectangle - rows = 2
+      doc_obj.rect(col_1 - 5, row_1 - 5, rect_width, 10 * 2, "F");
+      this.add_report_row(doc_obj, row_1, "Report for Batch: ", data.Batch_ID, "KPI: ", data.KPI);
+      this.add_report_row(doc_obj, row_2, "Date & Time: ", data.TIMESTAMP, "Recipe: ", data.Recipe);
 
+      // block two rectangle - rows = 4
+      doc_obj.setFillColor(l_blue);
+      doc_obj.rect(col_1 - 5, row_3 + 15, rect_width, 10 * 4, "F");
       // Block two in report
-      doc_obj.text("Batch Runtime: " + data.Run_Time, col_1, row_3 + 20);
-      doc_obj.text(
-        "Total Packs Produced: " + data.Total_Packs,
-        col_2,
-        row_3 + 20
-      );
-      doc_obj.text("Cost Per Pack: " + data.Pack_Cost, col_1, row_3 + 30);
-      doc_obj.text("End Line Leader: " + data.Line_Leader, col_2, row_3 + 30);
-
-      // Block three in report
-      doc_obj.text("Average Speed: " + data.Avg_Speed, col_1, row_3 + 40);
-      doc_obj.text("Average Weight: " + data.Avg_Wght, col_2, row_3 + 40);
-      doc_obj.text("Average T1: " + data.AvT1, col_1, row_3 + 50);
-      doc_obj.text("Labour Cost: " + data.Lbr_Cost, col_2, row_3 + 50);
+      this.add_report_row(doc_obj, row_3 + 20, "Batch Runtime: ", data.Run_Time, "Total Packs Produced: ", data.Total_Packs);
+      this.add_report_row(doc_obj, row_3 + 30, "Cost Per Pack: ", data.Pack_Cost, "End Line Leader: ", data.Line_Leader);
+      this.add_report_row(doc_obj, row_3 + 40, "Average Speed: ", data.Avg_Speed, "Average Weight: ", data.Avg_Wght);
+      this.add_report_row(doc_obj, row_3 + 50, "Average T1: ", data.AvT1, "Labour Cost: ", data.Lbr_Cost);
 
       doc_obj.line(10, 130, h_line_size, 130);
 
+//      doc_obj.autoTable({})
+
+      // Or use javascript directly:
+      doc_obj.autoTable({
+        head: [['Name', 'Total Packs', 'KPI %', 'GA g', 'T1 %']],
+        startY: tbl_row,
+       // tableWidth = 100,
+        body: [
+          ['Sandra', 234, 71, 0, 15.8],
+          ['Gheorgita', 221, 67, 0, 14.0],
+          ['Maghda', 194, 61, 0, 21.8]
+          // ...
+        ],
+        styles: { cellWidth: 20 },
+      })
       doc_obj.setDrawColor(0);
-      doc_obj.setFillColor(255, 0, 0);
+      doc_obj.setFillColor('3399FF');
       // rect(starting_x, starting_y, width, height, 'F')
-      doc_obj.rect(10, row_3, 75, 7, "F"); // filled red square
+      doc_obj.rect(bar_chart_col, bar_chart_row,Math.floor(75 * 0.8), 4, "F"); // filled red square
+      doc_obj.rect(bar_chart_col, bar_chart_row + 8, Math.floor(55 * 0.8), 4, "F");
+      doc_obj.rect(bar_chart_col, bar_chart_row + 16, Math.floor( 100* 0.8), 4, "F");
 
       return doc_obj;
     },
