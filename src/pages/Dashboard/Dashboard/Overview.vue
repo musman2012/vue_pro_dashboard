@@ -187,6 +187,7 @@ import {
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
+import { scale } from 'd3';
 
 export default {
   components: {
@@ -441,9 +442,32 @@ export default {
         .get("http://18.168.19.93:5000/fetchBatchReportData?q=" + batchID) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
           // window.batchData = response.data;
+          //console.log(response);
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
           var batch_end_data = jsoned_batch_data[0]._source;
+          var batch_start_data = jsoned_batch_data[1]._source;
+          var scale_used = batch_start_data.Scale_Qt;
+          var scales_ppm = {}; // this dict will be having Line leaders as keys 
+          var scales_t1 = {};
+          console.log(jsoned_batch_data.length);
+          console.log(response.data.length);
+          // values against the keys will be number of packs produced
+          for (let i = 2; i < jsoned_batch_data.length; i++) {
+              var scale_record = jsoned_batch_data[i]._source;
+              var operator = scale_record.Op_Name;
+              var ppm = scale_record.PPM; var t1ppm = scale_record.T1PPM;
+              if(operator in scales_ppm){
+                  scales_ppm[operator] += ppm;
+                  scales_t1[operator] += t1ppm;
+              }
+              else{
+                scales_ppm[operator] = ppm;
+                scales_t1[operator] = t1ppm;
+              }
+          }
           console.log(batch_end_data);
+          console.log(scales_ppm); 
+          console.log(scales_t1);
           var doc = new jsPDF();
           doc.setFont("times");
           // doc.setFont('Helvetica');

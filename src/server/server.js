@@ -142,11 +142,6 @@ app.get('/fetchBatchReportData', function (req, res) {
                         match: {
                             Batch_ID: req.query['q']
                         }
-                    },
-                    {
-                        match: {
-                            FLAG: "END"     // TODO
-                        }
                     }
                 ]
             }
