@@ -446,9 +446,11 @@ export default {
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
           var batch_end_data = jsoned_batch_data[0]._source;
           var batch_start_data = jsoned_batch_data[1]._source;
-          var scale_used = batch_start_data.Scale_Qt;
+          var target_speed = batch_start_data.Speed;
+          var batch_runtime = batch_end_data.Run_Time;
           var scales_ppm = {}; // this dict will be having Line leaders as keys 
-          var scales_t1 = {};
+          var scales_t1 = {}; var scales_kpi = {};
+          var scales_sp = {}; var scales_weight = {};
           console.log(jsoned_batch_data.length);
           console.log(response.data.length);
           // values against the keys will be number of packs produced
@@ -456,13 +458,19 @@ export default {
               var scale_record = jsoned_batch_data[i]._source;
               var operator = scale_record.Op_Name;
               var ppm = scale_record.PPM; var t1ppm = scale_record.T1PPM;
+              var weight = scale_record.Avg_Wght; var sp = scale_record.Set_Point;
               if(operator in scales_ppm){
                   scales_ppm[operator] += ppm;
                   scales_t1[operator] += t1ppm;
+                  scales_sp[operator] += sp;
+                  scales_weight[operator] += weight;
+                  scales_kpi[operator] = (ppm / batch_runtime) * target_speed;
               }
               else{
                 scales_ppm[operator] = ppm;
                 scales_t1[operator] = t1ppm;
+                scales_sp[operator] = sp;
+                scales_weight[operator] = weight;
               }
           }
           console.log(batch_end_data);
@@ -471,7 +479,7 @@ export default {
           var doc = new jsPDF();
           doc.setFont("times");
           // doc.setFont('Helvetica');
-          this.write_report_content(doc, batch_end_data, scales_ppm, scales_t1);
+          this.write_report_content(doc, batch_end_data, scales_ppm, scales_t1, scales_sp, scales_weight, scales_kpi);
           doc.save("a4.pdf");
         });
 
@@ -495,40 +503,28 @@ export default {
         doc_obj.text(text_1 + num_1, col_1, row);
         doc_obj.text(text_2 + num_2, col_2, row);
     },
-    populate_table_body(scales_ppm, scales_t1) {
+    populate_table_body(scales_ppm, scales_t1, scales_sp, scales_weight, scales_kpi) {
+        // compute Total_Packs, KPI %, GA, T1 % for each operator
+        // Total_Packs are already in scales_ppm
+        // T1 % --> (scales_t1/scales_ppm) * 100
+        // GA --> Avg_Speed (scales_weight[operator]-scales_sp[operator]) / scales_ppm[operator]
+        // KPI --> (Number of packs for operator / time in minutes) * Target Speed
         var table_body = [];
-        for (const [key, value] of Object.entries(scales_ppm)) {
+        for (const [operator, ppm] of Object.entries(scales_ppm)) {
           // console.log(key, value);
-          table_body.push([key, value]);
+          var t1 = scales_t1[operator];
+          var ga = (scales_weight[operator] - scales_sp[operator]) / ppm;
+          ga = ga.toFixed(2);
+          var kpi = scales_kpi[operator];
+          kpi = kpi.toFixed(2);
+          var t1_perc = (t1 / ppm)*100;
+          table_body.push([operator, ppm, kpi, ga, t1_perc]);
           //var temp = [key, value];
         }
         return table_body;
     },
-    write_report_content(doc_obj, data, scales_ppm, scales_t1) {
-      // .text("text to write", text_x, text_y)
-      // var unit = 2;
-      // var table = doc_obj
-      //   .table({ widths: [1.5*unit, 1.5*unit, null, 2*unit, 2.5*unit],
-      //   borderHorizontalWidths: function(i) { return i < 2 ? 1 : 0.1 },
-      //   padding: 5 });
-
-      //   var tr = table.header({ font: fonts.HelveticaBold, borderBottomWidth: 1.5 })
-      //               tr.cell('#')
-      //               tr.cell('Unit')
-      //               tr.cell('Subject')
-      //               tr.cell('Price', { textAlign: 'right' })
-      //               tr.cell('Total', { textAlign: 'right' });
-
-      // this.addRow(table, 2, 'Article A', lorem, 500)
-      // this.addRow(table, 1, 'Article B', lorem, 250)
-      // header.cell().image("static/img/MiWeigh_Large.png", { height: 2 * unit });
-      // header
-      //   .cell()
-      //   .text({ textAlign: "right" })
-      //   .add(
-      //     "A Portable Document Format (PDF) generation library targeting both the server- and client-side."
-      //   );
-      
+    write_report_content(doc_obj, data, scales_ppm, scales_t1, scales_sp, scales_weight, scales_kpi) {
+ 
       // defing colors columns and rows
       let l_yellow = 'FFFFCC', l_orange = 'FFE5CC', l_gray = 'E0E0E0', l_blue = 'CCE5FF';
       
@@ -556,7 +552,7 @@ export default {
       doc_obj.setTextColor(0,0,0);
       doc_obj.setFillColor(l_gray);
 
-      var table_body = this.populate_table_body(scales_ppm, scales_t1);
+      var table_body = this.populate_table_body(scales_ppm, scales_t1, scales_sp, scales_weight, scales_kpi);
       
       // block one rectangle - rows = 2
       doc_obj.rect(col_1 - 5, row_1 - 5, rect_width, 10 * 2, "F");
