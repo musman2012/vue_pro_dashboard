@@ -471,7 +471,7 @@ export default {
           var doc = new jsPDF();
           doc.setFont("times");
           // doc.setFont('Helvetica');
-          this.write_report_content(doc, batch_end_data);
+          this.write_report_content(doc, batch_end_data, scales_ppm, scales_t1);
           doc.save("a4.pdf");
         });
 
@@ -495,7 +495,16 @@ export default {
         doc_obj.text(text_1 + num_1, col_1, row);
         doc_obj.text(text_2 + num_2, col_2, row);
     },
-    write_report_content(doc_obj, data) {
+    populate_table_body(scales_ppm, scales_t1) {
+        var table_body = [];
+        for (const [key, value] of Object.entries(scales_ppm)) {
+          // console.log(key, value);
+          table_body.push([key, value]);
+          //var temp = [key, value];
+        }
+        return table_body;
+    },
+    write_report_content(doc_obj, data, scales_ppm, scales_t1) {
       // .text("text to write", text_x, text_y)
       // var unit = 2;
       // var table = doc_obj
@@ -519,6 +528,8 @@ export default {
       //   .add(
       //     "A Portable Document Format (PDF) generation library targeting both the server- and client-side."
       //   );
+      
+      // defing colors columns and rows
       let l_yellow = 'FFFFCC', l_orange = 'FFE5CC', l_gray = 'E0E0E0', l_blue = 'CCE5FF';
       
       var row_1 = 40;
@@ -532,6 +543,7 @@ export default {
       var h_line_size = 200;
       var rect_width = 200; var rect_height = 10 * 2;
       
+      // setting up the header with line lengths
       doc_obj.setLineWidth(0.35);
       doc_obj.line(10, 10, h_line_size, 10);
       doc_obj.addImage("static/img/MiWeigh_Large.png", "PNG", 10, 10, 40, 20);
@@ -543,6 +555,8 @@ export default {
       doc_obj.setFontSize(11);
       doc_obj.setTextColor(0,0,0);
       doc_obj.setFillColor(l_gray);
+
+      var table_body = this.populate_table_body(scales_ppm, scales_t1);
       
       // block one rectangle - rows = 2
       doc_obj.rect(col_1 - 5, row_1 - 5, rect_width, 10 * 2, "F");
@@ -567,12 +581,13 @@ export default {
         head: [['Name', 'Total Packs', 'KPI %', 'GA g', 'T1 %']],
         startY: tbl_row,
        // tableWidth = 100,
-        body: [
-          ['Sandra', 234, 71, 0, 15.8],
-          ['Gheorgita', 221, 67, 0, 14.0],
-          ['Maghda', 194, 61, 0, 21.8]
-          // ...
-        ],
+        // body: [
+        //   ['Sandra', 234, 71, 0, 15.8],
+        //   ['Gheorgita', 221, 67, 0, 14.0],
+        //   ['Maghda', 194, 61, 0, 21.8]
+        //   // ...
+        // ],
+        body: table_body,
         styles: { cellWidth: 20 },
       })
       doc_obj.setDrawColor(0);
