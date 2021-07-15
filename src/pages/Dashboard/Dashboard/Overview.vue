@@ -542,16 +542,19 @@ export default {
       // defing colors columns and rows
       let l_yellow = 'FFFFCC', l_orange = 'FFE5CC', l_gray = 'E0E0E0', l_blue = 'CCE5FF';
       
+      var row_indent = 7;
       var row_1 = 40;
-      var row_2 = row_1 + 10;
+      var row_2 = row_1 + row_indent;
       var row_3 = row_2 + 10;
-      var tbl_row = row_3 + 70; var tbl_width = 100;
+      var block_one = row_1, block_two = row_2 + row_indent;
+      var tbl_row = block_two + (5*row_indent); var tbl_width = 100;
       var bar_chart_col = 115; var bar_chart_row = tbl_row + 13;
+      var last_table_row = -99;
 
       var col_1 = 10;
       var col_2 = 100;
       var h_line_size = 200;
-      var rect_width = 200; var rect_height = 10 * 2;
+      var rect_width = 190; var rect_height = 10 * 2;
       
       // setting up the header with line lengths
       doc_obj.setLineWidth(0.35);
@@ -559,7 +562,7 @@ export default {
       doc_obj.addImage("static/img/MiWeigh_Large.png", "PNG", 10, 10, 40, 20);
       doc_obj.setTextColor(100,140,80);
       doc_obj.setFontSize(30);
-      doc_obj.text('Batch Report', 80, 20);
+      doc_obj.text('Batch Report', 75, 25);
       // Block one in report
       doc_obj.line(10, 30, h_line_size, 30);
       doc_obj.setFontSize(11);
@@ -569,39 +572,30 @@ export default {
       var table_body = this.populate_table_body(scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed);
       
       // block one rectangle - rows = 2
-      doc_obj.rect(col_1 - 5, row_1 - 5, rect_width, 10 * 2, "F");
+      doc_obj.setDrawColor(0,0,0);
+      doc_obj.rect(col_1 - 3, row_1 - 5, rect_width, row_indent * 2, "FD");
       this.add_report_row(doc_obj, row_1, "Report for Batch: ", data.Batch_ID, "KPI: ", data.KPI);
       this.add_report_row(doc_obj, row_2, "Date & Time: ", data.TIMESTAMP, "Recipe: ", data.Recipe);
 
       // block two rectangle - rows = 4
       doc_obj.setFillColor(l_blue);
-      doc_obj.rect(col_1 - 5, row_3 + 15, rect_width, 10 * 4, "F");
+      doc_obj.rect(col_1 - 3, block_two + 2, rect_width, row_indent * 4, "FD");
       // Block two in report
-      this.add_report_row(doc_obj, row_3 + 20, "Batch Runtime: ", data.Run_Time, "Total Packs Produced: ", data.Total_Packs);
-      this.add_report_row(doc_obj, row_3 + 30, "Cost Per Pack: ", data.Pack_Cost, "End Line Leader: ", data.Line_Leader);
-      this.add_report_row(doc_obj, row_3 + 40, "Average Speed: ", data.Avg_Speed, "Average Weight: ", data.Avg_Wght);
-      this.add_report_row(doc_obj, row_3 + 50, "Average T1: ", data.AvT1, "Labour Cost: ", data.Lbr_Cost);
+      this.add_report_row(doc_obj, block_two + row_indent, "Batch Runtime: ", data.Run_Time, "Total Packs Produced: ", data.Total_Packs);
+      this.add_report_row(doc_obj, block_two + (2*row_indent), "Cost Per Pack: ", data.Pack_Cost, "End Line Leader: ", data.Line_Leader);
+      this.add_report_row(doc_obj, block_two + (3*row_indent), "Average Speed: ", data.Avg_Speed, "Average Weight: ", data.Avg_Wght);
+      this.add_report_row(doc_obj, block_two + (4*row_indent), "Average T1: ", data.AvT1, "Labour Cost: ", data.Lbr_Cost);
 
-      doc_obj.line(10, 130, h_line_size, 130);
+     // doc_obj.line(10, 130, h_line_size, 130);
 
-//      doc_obj.autoTable({})
-
-      // Or use javascript directly:
       doc_obj.autoTable({
         head: [['Name', 'Total Packs', 'KPI %', 'GA g', 'T1 %']],
         startY: tbl_row,
-       // tableWidth = 100,
-        // body: [
-        //   ['Sandra', 234, 71, 0, 15.8],
-        //   ['Gheorgita', 221, 67, 0, 14.0],
-        //   ['Maghda', 194, 61, 0, 21.8]
-        //   // ...
-        // ],
         body: table_body,
         styles: { cellWidth: 20 },
       })
       
-      //var counter = 0;
+      // adding bar charts to the report
       for (let i = 0; i < window.scales_kpi.length; i++) {
           doc_obj.setDrawColor(0);
           doc_obj.setFillColor('CC0000');
@@ -613,13 +607,8 @@ export default {
           console.log("Bar length is "+Math.floor(kpi * 0.6));
           //counter += 1;
       }
-      
-      
       // rect(starting_x, starting_y, width, height, 'F')
-      // doc_obj.rect(bar_chart_col, bar_chart_row,Math.floor(75 * 0.8), 4, "F"); // filled red square
-      // doc_obj.rect(bar_chart_col, bar_chart_row + 8, Math.floor(55 * 0.8), 4, "F");
-      // doc_obj.rect(bar_chart_col, bar_chart_row + 16, Math.floor( 100* 0.8), 4, "F");
-
+ 
       return doc_obj;
     },
     search(Line) {
