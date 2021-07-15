@@ -490,7 +490,7 @@ export default {
           var doc = new jsPDF();
           doc.setFont("times");
           // doc.setFont('Helvetica');
-          this.write_report_content(doc, batch_end_data, scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed);
+          this.write_report_content(doc, batch_end_data, batch_start_data, scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed);
           doc.save("a4.pdf");
         });
 
@@ -537,7 +537,7 @@ export default {
         }
         return table_body;
     },
-    write_report_content(doc_obj, data, scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed) {
+    write_report_content(doc_obj, data, st_data, scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed) {
  
       // defing colors columns and rows
       let l_yellow = 'FFFFCC', l_orange = 'FFE5CC', l_gray = 'E0E0E0', l_blue = 'CCE5FF';
@@ -549,7 +549,7 @@ export default {
       var block_one = row_1, block_two = row_2 + row_indent;
       var tbl_row = block_two + (5*row_indent); var tbl_width = 100;
       var bar_chart_col = 115; var bar_chart_row = tbl_row + 13;
-      var last_table_row = -99;
+      var block_three = -99;
 
       var col_1 = 10;
       var col_2 = 100;
@@ -559,7 +559,7 @@ export default {
       // setting up the header with line lengths
       doc_obj.setLineWidth(0.35);
       doc_obj.line(10, 10, h_line_size, 10);
-      doc_obj.addImage("static/img/MiWeigh_Large.png", "PNG", 10, 10, 40, 20);
+      doc_obj.addImage("static/img/MiWeigh_Large.png", "PNG", 10, 10, 40, 17);
       doc_obj.setTextColor(100,140,80);
       doc_obj.setFontSize(30);
       doc_obj.text('Batch Report', 75, 25);
@@ -582,9 +582,9 @@ export default {
       doc_obj.rect(col_1 - 3, block_two + 2, rect_width, row_indent * 4, "FD");
       // Block two in report
       this.add_report_row(doc_obj, block_two + row_indent, "Batch Runtime: ", data.Run_Time, "Total Packs Produced: ", data.Total_Packs);
-      this.add_report_row(doc_obj, block_two + (2*row_indent), "Cost Per Pack: ", data.Pack_Cost, "End Line Leader: ", data.Line_Leader);
-      this.add_report_row(doc_obj, block_two + (3*row_indent), "Average Speed: ", data.Avg_Speed, "Average Weight: ", data.Avg_Wght);
-      this.add_report_row(doc_obj, block_two + (4*row_indent), "Average T1: ", data.AvT1, "Labour Cost: ", data.Lbr_Cost);
+      this.add_report_row(doc_obj, block_two + (2*row_indent), "Start Line Leader: ", st_data.Line_Leader, "End Line Leader: ", data.Line_Leader);
+      this.add_report_row(doc_obj, block_two + (3*row_indent), "Target Speed: ", st_data.Speed, "Num of Operators: ", st_data.Operator_QT);
+      this.add_report_row(doc_obj, block_two + (4*row_indent), "Tolerance: ", st_data.Tolerance, "Num of Scales: ", st_data.Scale_QT);
 
      // doc_obj.line(10, 130, h_line_size, 130);
 
@@ -593,6 +593,7 @@ export default {
         startY: tbl_row,
         body: table_body,
         styles: { cellWidth: 20 },
+        theme: 'grid'
       })
       
       // adding bar charts to the report
@@ -606,9 +607,20 @@ export default {
           doc_obj.rect(bar_chart_col, bar_chart_row + (i*8),Math.floor(kpi * 0.7), 4, "F"); // filled red square
           console.log("Bar length is "+Math.floor(kpi * 0.6));
           //counter += 1;
+          block_three = bar_chart_row + (i*8) + row_indent;
       }
       // rect(starting_x, starting_y, width, height, 'F')
- 
+      //doc_obj.text('Batch Report Ends', col_1, block_three + row_indent);
+
+      doc_obj.setFillColor(l_blue);
+      doc_obj.rect(col_1 - 3, block_three , rect_width, row_indent * 6, "FD");
+      // Block two in report
+      this.add_report_row(doc_obj, block_three + row_indent, "Total Packs: ", data.Total_Packs, "Cost / Pack: £", data.Pack_Cost);
+      this.add_report_row(doc_obj, block_three + (2*row_indent), "Average Speed: ", data.Pack_Cost, "GA Cost: £", data.Ga_Cost);
+      this.add_report_row(doc_obj, block_three + (3*row_indent), "Total KPI%: ", data.Avg_Speed, "Product Cost: £", data.Prd_Cost);
+      this.add_report_row(doc_obj, block_three + (4*row_indent), "-T1 Final: ", data.AvT1, "Labour Cost: £", data.Lbr_Cost);
+      this.add_report_row(doc_obj, block_three + (5*row_indent), "Average Weight: ", data.Avg_Wght, "Total Cost: £", data.Total_Cost);
+
       return doc_obj;
     },
     search(Line) {
