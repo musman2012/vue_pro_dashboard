@@ -444,8 +444,7 @@ export default {
           // window.batchData = response.data;
           //console.log(response);
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-          // todo: End transaction might not be the first one (Causing NaNs for KPIs)
-          // iterating over the jsoned_batch_data and check the flag first
+          
           var batch_end_data = []; 
           var batch_start_data = []; 
           var target_speed = 0; 
@@ -522,6 +521,7 @@ export default {
         // GA --> Avg_Speed (scales_weight[operator]-scales_sp[operator]) / scales_ppm[operator]
         // KPI --> (Number of packs for operator / time in minutes) * Target Speed
         var table_body = [];
+        window.scales_kpi = [];
         for (const [operator, ppm] of Object.entries(scales_ppm)) {
           // console.log(key, value);
           var t1 = scales_t1[operator];
@@ -530,6 +530,7 @@ export default {
           var kpi = (ppm / batch_runtime) * target_speed;
           console.log("PPM " + ppm + " RT " + batch_runtime + " Target "+target_speed);
           kpi = kpi.toFixed(2);
+          window.scales_kpi.push(kpi);
           var t1_perc = (t1 / ppm)*100;
           table_body.push([operator, ppm, kpi, ga, t1_perc]);
           //var temp = [key, value];
@@ -599,12 +600,25 @@ export default {
         body: table_body,
         styles: { cellWidth: 20 },
       })
-      doc_obj.setDrawColor(0);
-      doc_obj.setFillColor('3399FF');
+      
+      //var counter = 0;
+      for (let i = 0; i < window.scales_kpi.length; i++) {
+          doc_obj.setDrawColor(0);
+          doc_obj.setFillColor('CC0000');
+          var kpi = window.scales_kpi[i];
+          if (kpi > 100){
+            doc_obj.setFillColor('4C9900');
+          }
+          doc_obj.rect(bar_chart_col, bar_chart_row + (i*8),Math.floor(kpi * 0.7), 4, "F"); // filled red square
+          console.log("Bar length is "+Math.floor(kpi * 0.6));
+          //counter += 1;
+      }
+      
+      
       // rect(starting_x, starting_y, width, height, 'F')
-      doc_obj.rect(bar_chart_col, bar_chart_row,Math.floor(75 * 0.8), 4, "F"); // filled red square
-      doc_obj.rect(bar_chart_col, bar_chart_row + 8, Math.floor(55 * 0.8), 4, "F");
-      doc_obj.rect(bar_chart_col, bar_chart_row + 16, Math.floor( 100* 0.8), 4, "F");
+      // doc_obj.rect(bar_chart_col, bar_chart_row,Math.floor(75 * 0.8), 4, "F"); // filled red square
+      // doc_obj.rect(bar_chart_col, bar_chart_row + 8, Math.floor(55 * 0.8), 4, "F");
+      // doc_obj.rect(bar_chart_col, bar_chart_row + 16, Math.floor( 100* 0.8), 4, "F");
 
       return doc_obj;
     },
