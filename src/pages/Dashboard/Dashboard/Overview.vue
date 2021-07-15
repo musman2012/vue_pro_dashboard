@@ -452,7 +452,7 @@ export default {
           var scales_ppm = {}; // this dict will be having Line leaders as keys 
           var scales_t1 = {}; var scales_kpi = {};
           var scales_sp = {}; var scales_weight = {};
-          console.log(jsoned_batch_data.length);
+          
           console.log(response.data.length);
           // values against the keys will be number of packs produced
           for (let i = 0; i < jsoned_batch_data.length; i++) {
@@ -485,6 +485,7 @@ export default {
               }
           }
           console.log(batch_end_data);
+          console.log(batch_start_data);
           console.log(scales_ppm); 
           console.log(scales_t1);
           var doc = new jsPDF();
@@ -549,7 +550,7 @@ export default {
       var block_one = row_1, block_two = row_2 + row_indent;
       var tbl_row = block_two + (5*row_indent); var tbl_width = 100;
       var bar_chart_col = 115; var bar_chart_row = tbl_row + 13;
-      var block_three = -99;
+      var block_three = -99; var block_four = block_three + (7*row_indent);
 
       var col_1 = 10;
       var col_2 = 100;
@@ -584,8 +585,8 @@ export default {
       // Block two in report
       this.add_report_row(doc_obj, block_two + row_indent, "Batch Runtime: ", data.Run_Time, "Total Packs Produced: ", data.Total_Packs);
       this.add_report_row(doc_obj, block_two + (2*row_indent), "Start Line Leader: ", st_data.Line_Leader, "End Line Leader: ", data.Line_Leader);
-      this.add_report_row(doc_obj, block_two + (3*row_indent), "Target Speed: ", st_data.Speed, "Num of Operators: ", st_data.Operator_QT);
-      this.add_report_row(doc_obj, block_two + (4*row_indent), "Tolerance: ", st_data.Tolerance, "Num of Scales: ", st_data.Scale_QT);
+      this.add_report_row(doc_obj, block_two + (3*row_indent), "Target Speed: ", st_data.Speed, "Num of Operators: ", st_data.Operator_Qt);
+      this.add_report_row(doc_obj, block_two + (4*row_indent), "Tolerance: ", st_data.Tolerance, "Num of Scales: ", st_data.Scale_Qt);
 
      // doc_obj.line(10, 130, h_line_size, 130);
 
@@ -621,6 +622,12 @@ export default {
       this.add_report_row(doc_obj, block_three + (3*row_indent), "Total KPI%: ", data.Avg_Speed, "Product Cost: £", data.Prd_Cost);
       this.add_report_row(doc_obj, block_three + (4*row_indent), "-T1 Final: ", data.AvT1, "Labour Cost: £", data.Lbr_Cost);
       this.add_report_row(doc_obj, block_three + (5*row_indent), "Average Weight: ", data.Avg_Wght, "Total Cost: £", data.Total_Cost);
+
+      block_four = block_three + (8*row_indent);
+      doc_obj.setFillColor(l_yellow);
+      doc_obj.rect(col_1 - 3, block_four - 3, rect_width, row_indent * 2, "FD");
+      doc_obj.text("Notes: _____________________", col_1, block_four + row_indent);
+      doc_obj.text("Signature: _____________________", col_2, block_four + row_indent);
 
       return doc_obj;
     },
