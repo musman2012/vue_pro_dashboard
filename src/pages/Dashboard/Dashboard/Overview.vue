@@ -563,6 +563,7 @@ export default {
       doc_obj.setTextColor(100,140,80);
       doc_obj.setFontSize(30);
       doc_obj.text('Batch Report', 75, 25);
+      doc_obj.addImage("static/img/pa_logo.png", "PNG", 180, 10, 18, 18);
       // Block one in report
       doc_obj.line(10, 30, h_line_size, 30);
       doc_obj.setFontSize(11);
