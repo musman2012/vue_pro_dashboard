@@ -214,20 +214,20 @@ export default {
       value: "",
       batches_dict: {},
       batchesData: [
-        {
-          batch_id: 1,
-          recipe: "Dakota Rice",
-          packs_produced: 2352,
-          end_time: "12/02/2999 12:23",
-          kpi: 0.6,
-        },
-        {
-          batch_id: 2,
-          recipe: "Mineroia Rice",
-          packs_produced: 23152,
-          end_time: "12/03/2999 12:23",
-          kpi: 0.3,
-        },
+        // {
+        //   batch_id: 1,
+        //   recipe: "Dakota Rice",
+        //   packs_produced: 2352,
+        //   end_time: "12/02/2999 12:23",
+        //   kpi: 0.6,
+        // },
+        // {
+        //   batch_id: 2,
+        //   recipe: "Mineroia Rice",
+        //   packs_produced: 23152,
+        //   end_time: "12/03/2999 12:23",
+        //   kpi: 0.3,
+        // },
       ],
       pieChart: {
         data: {
@@ -444,18 +444,30 @@ export default {
           // window.batchData = response.data;
           //console.log(response);
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-          var batch_end_data = jsoned_batch_data[0]._source;
-          var batch_start_data = jsoned_batch_data[1]._source;
-          var target_speed = batch_start_data.Speed;
-          var batch_runtime = batch_end_data.Run_Time;
+          // todo: End transaction might not be the first one (Causing NaNs for KPIs)
+          // iterating over the jsoned_batch_data and check the flag first
+          var batch_end_data = []; 
+          var batch_start_data = []; 
+          var target_speed = 0; 
+          var batch_runtime = 0; 
           var scales_ppm = {}; // this dict will be having Line leaders as keys 
           var scales_t1 = {}; var scales_kpi = {};
           var scales_sp = {}; var scales_weight = {};
           console.log(jsoned_batch_data.length);
           console.log(response.data.length);
           // values against the keys will be number of packs produced
-          for (let i = 2; i < jsoned_batch_data.length; i++) {
+          for (let i = 0; i < jsoned_batch_data.length; i++) {
               var scale_record = jsoned_batch_data[i]._source;
+              if (scale_record.FLAG == 'END'){
+                  batch_end_data = jsoned_batch_data[i]._source;
+                  batch_runtime = batch_end_data.Run_Time;
+                  continue;
+              } else if (scale_record.FLAG == 'START'){
+                  batch_start_data = jsoned_batch_data[i]._source;
+                  target_speed = batch_start_data.Speed;
+                  continue;
+              }
+
               var operator = scale_record.Op_Name;
               var ppm = scale_record.PPM; var t1ppm = scale_record.T1PPM;
               var weight = scale_record.Avg_Wght; var sp = scale_record.Set_Point;
@@ -464,7 +476,7 @@ export default {
                   scales_t1[operator] += t1ppm;
                   scales_sp[operator] += sp;
                   scales_weight[operator] += weight;
-                  scales_kpi[operator] = (ppm / batch_runtime) * target_speed;
+                  //scales_kpi[operator] = (ppm / batch_runtime) * target_speed;
               }
               else{
                 scales_ppm[operator] = ppm;
@@ -479,7 +491,7 @@ export default {
           var doc = new jsPDF();
           doc.setFont("times");
           // doc.setFont('Helvetica');
-          this.write_report_content(doc, batch_end_data, scales_ppm, scales_t1, scales_sp, scales_weight, scales_kpi);
+          this.write_report_content(doc, batch_end_data, scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed);
           doc.save("a4.pdf");
         });
 
@@ -503,7 +515,7 @@ export default {
         doc_obj.text(text_1 + num_1, col_1, row);
         doc_obj.text(text_2 + num_2, col_2, row);
     },
-    populate_table_body(scales_ppm, scales_t1, scales_sp, scales_weight, scales_kpi) {
+    populate_table_body(scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed) {
         // compute Total_Packs, KPI %, GA, T1 % for each operator
         // Total_Packs are already in scales_ppm
         // T1 % --> (scales_t1/scales_ppm) * 100
@@ -515,7 +527,8 @@ export default {
           var t1 = scales_t1[operator];
           var ga = (scales_weight[operator] - scales_sp[operator]) / ppm;
           ga = ga.toFixed(2);
-          var kpi = scales_kpi[operator];
+          var kpi = (ppm / batch_runtime) * target_speed;
+          console.log("PPM " + ppm + " RT " + batch_runtime + " Target "+target_speed);
           kpi = kpi.toFixed(2);
           var t1_perc = (t1 / ppm)*100;
           table_body.push([operator, ppm, kpi, ga, t1_perc]);
@@ -523,7 +536,7 @@ export default {
         }
         return table_body;
     },
-    write_report_content(doc_obj, data, scales_ppm, scales_t1, scales_sp, scales_weight, scales_kpi) {
+    write_report_content(doc_obj, data, scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed) {
  
       // defing colors columns and rows
       let l_yellow = 'FFFFCC', l_orange = 'FFE5CC', l_gray = 'E0E0E0', l_blue = 'CCE5FF';
@@ -552,7 +565,7 @@ export default {
       doc_obj.setTextColor(0,0,0);
       doc_obj.setFillColor(l_gray);
 
-      var table_body = this.populate_table_body(scales_ppm, scales_t1, scales_sp, scales_weight, scales_kpi);
+      var table_body = this.populate_table_body(scales_ppm, scales_t1, scales_sp, scales_weight, batch_runtime, target_speed);
       
       // block one rectangle - rows = 2
       doc_obj.rect(col_1 - 5, row_1 - 5, rect_width, 10 * 2, "F");
