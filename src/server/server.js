@@ -70,6 +70,22 @@ app.get('/insertDataDB', function (req, res) {
     });
 });
 
+app.get('/getCredsDB', function (req, res) {
+    var email = req.query['Email'];
+    var sql_query = 'SELECT Password from Users WHERE Email = ?';
+    //  (Name, Email, Password, Company) VALUES ('"
+    // +req.query['Name']+"', '"
+    // +req.query['Email']+"', '"
+    // +req.query['Password']+"', '"
+    // +req.query['Company']+"');";
+    console.log(sql_query)
+    connection.query(sql_query, [email], function (err, result) {
+        if (err) throw err;
+        console.log("Password is "+result);
+        res.send(result);
+    });
+});
+
 app.get('/search', function (req, res) {
     console.log("search reqs recvd");
     let body = {

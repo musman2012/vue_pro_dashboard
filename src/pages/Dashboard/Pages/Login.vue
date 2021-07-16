@@ -65,6 +65,7 @@ import { Checkbox as LCheckbox, FadeRenderTransition } from 'src/components/inde
 import AuthLayout from './AuthLayout.vue'
 import { extend } from "vee-validate";
 import { required, email, min } from "vee-validate/dist/rules";
+import axios from "axios";
 
 extend("email", email);
 extend("required", required);
@@ -86,8 +87,23 @@ extend("min", min);
     methods: {
       submit() {
         // alert("Form has been submitted!");
-        // TODO: here we can use DB connect to fetch user creds and validate before logging in
-        this.$router.push({ name: 'Overview' })
+        // TODO Friday: here we can use DB connect to fetch user creds and validate before logging in
+        // Fetch data from Users table and match with the given creds --> If there is a match goto Overview
+        window.fetched_password = "";
+        axios
+        .get("http://18.168.19.93:5000/getCredsDB?Email=" + this.email) 
+        //  + "&Email=" + this.email    
+        //  + "&Company=" + this.company
+        //  + "&Password=" + this.password) //&sDate=01/08/2020&eDate=04/08/2020')
+        .then((response) => {
+          //this.$router.push({ name: 'Login' })
+            console.log(response.data[0].Password);
+            window.fetched_password = response.data[0].Password;
+            console.log("Fetched "+fetched_password+" Written "+this.password);
+            if (window.fetched_password == this.password)
+                this.$router.push({ name: 'Overview' })
+        });
+        
       },
       toggleNavbar () {
         document.body.classList.toggle('nav-open')

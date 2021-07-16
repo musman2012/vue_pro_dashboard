@@ -50,7 +50,7 @@
         </fade-render-transition> -->
       </div>
       <div class="col-md-4 mr-auto">
-        <form method="#" action="#">
+        <form method="#" action="#/Login">
           <card class="card-plain">
             <div>
               <fg-input placeholder="Your Name" v-model="name"></fg-input>
