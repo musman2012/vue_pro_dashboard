@@ -66,6 +66,7 @@ import AuthLayout from './AuthLayout.vue'
 import { extend } from "vee-validate";
 import { required, email, min } from "vee-validate/dist/rules";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 extend("email", email);
 extend("required", required);
@@ -76,7 +77,7 @@ extend("min", min);
       LCheckbox,
       FadeRenderTransition,
       AuthLayout
-    },
+    }, 
     data() {
       return {
         email: "",
@@ -102,6 +103,20 @@ extend("min", min);
             console.log("Fetched "+fetched_password+" Written "+this.password);
             if (window.fetched_password == this.password)
                 this.$router.push({ name: 'Overview' })
+            else {
+            //     <l-alert type="danger" dismissible="">
+            //   <span>
+            //     <b> Danger - </b> This is a regular notification made with ".alert-danger"</span>
+            // </l-alert>
+                 console.log("Password incorrent");
+                 Swal.fire({
+                    title: `Credentials incorrect.`,
+                    buttonsStyling: true,
+                    confirmButtonClass: 'btn btn-success btn-fill'
+                  })
+                // Alert component can be used
+              // TODO Prompt an error message
+            }
         });
         
       },
