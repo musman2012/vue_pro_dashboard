@@ -1,6 +1,37 @@
 <template>
   <div> 
     <div class="row">
+      <div class="col-xl-3 col-md-4">
+        <h5>Progress One</h5>
+        <Progress
+        :radius="50"
+        :strokeWidth="10"
+        value="86.12"
+      >
+        </Progress>
+      </div>
+      <div class="col-xl-3 col-md-4">
+        <h5>Progress Two</h5>
+        <Progress
+        :transitionDuration="1000"
+        :radius="50"
+        :strokeWidth="10"
+        value="86.12"
+      >
+        </Progress>
+      </div>
+      <div class="col-xl-3 col-md-4">
+        <h5>Progress Three</h5>
+        <Progress
+        :transitionDuration="2000"
+        :radius="50"
+        :strokeWidth="10"
+        value="86.12"
+      >
+        </Progress>
+      </div>
+    </div>
+    <div class="row">
         <div class="col-xl-3 col-md-6">
           <stats-card v-bind:title="num_machines" subTitle="Running Machines">
             <div slot="header" class="icon-warning">
@@ -231,7 +262,7 @@
         <time-line-item class="timeline-inverted" badge-type="danger" badgeIcon="ti-gallery">
           <span slot="header" class="label label-danger"> Spared some place for anything related to Machines</span>
           <p slot="body">
-            Wifey made the best Father's Day meal ever. So thankful so happy so blessed. Thank you for making my family We just had fun with the “future” theme !!!   It was a fun night all together ... The always rude Kanye Show at 2am Sold Out Famous viewing @ Figueroa and 12th in downtown.</p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu interdum neque. Pellentesque congue tortor in euismod pretium. Pellentesque viverra libero ac orci lacinia, sed condimentum sem suscipit. Duis porta augue nibh, ut porta nibh aliquet non. Proin luctus lectus sit amet tortor ultricies, sit amet volutpat odio euismod.</p>
 
           <h6 slot="footer">
             <i class="ti-time"></i>
@@ -242,7 +273,7 @@
         <time-line-item class="timeline-inverted" badge-type="success" badgeIcon="ti-credit-card">
           <span slot="header" class="label label-info">Another Title</span>
           <p slot="body">
-            Thank God for the support of my wife and real friends. I also wanted to point out that it’s the first album to go number 1 off of streaming!!! I love you Ellen and also my number one design rule of anything I do from shoes to music to homes is that Kim has to like it....</p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dignissim est quis sollicitudin mattis. Sed nibh mauris, fringilla ut dui ut, pellentesque malesuada augue. Proin eu aliquam ex. Nam in.....</p>
         </time-line-item>
 
         <time-line-item class="timeline-inverted" badge-type="info" badgeIcon="ti-check-box">
@@ -277,6 +308,7 @@
   import TaskList from './Stats/TaskList'
   import ChartCard from 'src/components/Cards/ChartCard.vue'
   import StatsCard from "src/components/Cards/StatsCard.vue";
+  import Progress from "easy-circular-progress";
 
   export default {
     components: {
@@ -284,7 +316,8 @@
       TimeLineItem,
       ChartCard,
       TaskList,
-      StatsCard
+      StatsCard,
+      Progress
     },
     data () {
       return {

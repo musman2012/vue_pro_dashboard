@@ -196,7 +196,7 @@ let lockPage = {
 const routes = [
   {
     path: '/',
-    redirect: '/admin/overview' // TODO: change this to Login page to make that Landing page
+    redirect: '/login' // 
   },
   componentsMenu,
   formsMenu,
