@@ -1,18 +1,64 @@
 <template>
+  <div> 
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+          <stats-card v-bind:title="num_machines" subTitle="Running Machines">
+            <div slot="header" class="icon-warning">
+              <i class="nc-icon nc-delivery-fast text-warning"></i>
+            </div>
+            <template slot="footer">
+              <i class="fa fa-refresh"></i>Updated now
+            </template>
+          </stats-card>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <stats-card v-bind:title="healthy_machines" subTitle="Healthy Machines">
+            <div slot="header" class="icon-success">
+              <i class="nc-icon nc-satisfied text-success"></i>
+            </div>
+            <template slot="footer">
+              <i class="fa fa-calendar-o"></i>Updated now
+            </template>
+          </stats-card>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <stats-card title="2" subTitle="Idle Machines">
+            <div slot="header" class="icon-danger">
+              <i class="nc-icon nc-button-power text-danger"></i>
+            </div>
+            <template slot="footer">
+              <i class="fa fa-clock-o"></i>Last day
+            </template>
+          </stats-card>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <stats-card title="3" subTitle="Machines Failing Health Tests">
+            <div slot="header" class="icon-info">
+              <i class="nc-icon nc-fav-remove text-danger"></i>
+            </div>
+            <template slot="footer">
+              <i class="fa fa-refresh"></i>Updated now
+            </template>
+          </stats-card>
+        </div>
+      </div>
   <div class="row">
     <div class="col-md-6">
       <chart-card :chart-data="salesChart.data" :chart-options="salesChart.options">
         <div slot="header">
-          <h4 class="card-title">2015 Sales</h4>
-          <p class="category">All products including Taxes</p>
+          <h4 class="card-title">Machine Data</h4>
+          <p class="category">Comparing two machines datasets</p>
         </div>
         <div class="stats" slot="footer-title">
           <i class="ti-check"></i> Data information certified
         </div>
         <div slot="footer">
           <div class="chart-legend">
-            <i class="fa fa-circle text-info"></i> Tesla Model S
-            <i class="fa fa-circle text-warning"></i> BMW 5 Series
+            <i class="fa fa-circle text-info"></i> Machine One
+            <i class="fa fa-circle text-warning"></i> Machine Two
           </div>
           <hr>
           <div class="stats">
@@ -24,7 +70,7 @@
     <div class="col-md-6">
       <chart-card :chart-data="usersChart.data" :chart-options="usersChart.options">
         <div slot="header">
-          <h4 class="card-title">Users Behavior</h4>
+          <h4 class="card-title">Machines Production History</h4>
           <p class="category">24 hours performance</p>
         </div>
 
@@ -33,9 +79,9 @@
         </div>
         <div slot="footer">
           <div class="chart-legend">
-            <i class="fa fa-circle text-info"></i> Open
-            <i class="fa fa-circle text-danger"></i> Click
-            <i class="fa fa-circle text-warning"></i> Click Second Time
+            <i class="fa fa-circle text-info"></i> Machine One
+            <i class="fa fa-circle text-danger"></i> Machine Two
+            <i class="fa fa-circle text-warning"></i> Machine Three
           </div>
           <hr>
           <div class="stats">
@@ -45,7 +91,7 @@
       </chart-card>
     </div>
 
-    <div class="col-lg-6 col-sm-6">
+    <!-- <div class="col-lg-6 col-sm-6">
       <chart-card :chart-data="subscriptionsChart.data" :chart-options="subscriptionsChart.options">
         <span slot="title">169</span>
         <span slot="title-label" class="label label-danger">
@@ -82,14 +128,14 @@
         </button>
       </chart-card>
     </div>
-
+       -->
 
 
     <div class="col-md-6">
       <task-list></task-list>
 
       <div class="card card-chat">
-        <div class="card-header">
+        <!-- <div class="card-header">
           <h4 class="card-title">Chat</h4>
           <p class="category">With Tania Andrew</p>
         </div>
@@ -177,13 +223,13 @@
               <button class="btn btn-primary btn-fill">Send</button>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="col-md-6">
       <time-line type="simple">
         <time-line-item class="timeline-inverted" badge-type="danger" badgeIcon="ti-gallery">
-          <span slot="header" class="label label-danger">Some title</span>
+          <span slot="header" class="label label-danger"> Spared some place for anything related to Machines</span>
           <p slot="body">
             Wifey made the best Father's Day meal ever. So thankful so happy so blessed. Thank you for making my family We just had fun with the “future” theme !!!   It was a fun night all together ... The always rude Kanye Show at 2am Sold Out Famous viewing @ Figueroa and 12th in downtown.</p>
 
@@ -223,22 +269,27 @@
       </time-line>
     </div>
   </div>
+  </div>
 </template>
 <script>
   import TimeLine from './Stats/TimeLine.vue'
   import TimeLineItem from './Stats/TimeLineItem.vue'
   import TaskList from './Stats/TaskList'
   import ChartCard from 'src/components/Cards/ChartCard.vue'
+  import StatsCard from "src/components/Cards/StatsCard.vue";
 
   export default {
     components: {
       TimeLine,
       TimeLineItem,
       ChartCard,
-      TaskList
+      TaskList,
+      StatsCard
     },
     data () {
       return {
+        num_machines: "15",
+        healthy_machines: "14",
         salesChart: {
           data: {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],

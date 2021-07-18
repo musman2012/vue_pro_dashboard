@@ -53,7 +53,7 @@
       <div class="col-xl-3 col-md-6">
         <stats-card v-bind:title="totalCost" subTitle="Avg Pack Cost Per Batch">
           <div slot="header" class="icon-success">
-            <i class="nc-icon nc-light-3 text-success"></i>
+            <i class="nc-icon nc-money-coins text-success"></i>
           </div>
           <template slot="footer">
             <i class="fa fa-calendar-o"></i>Updated now
@@ -64,7 +64,7 @@
       <div class="col-xl-3 col-md-6">
         <stats-card title="23" subTitle="Downtime">
           <div slot="header" class="icon-danger">
-            <i class="nc-icon nc-vector text-danger"></i>
+            <i class="nc-icon nc-button-power text-danger"></i>
           </div>
           <template slot="footer">
             <i class="fa fa-clock-o"></i>Last day
@@ -216,20 +216,6 @@ export default {
       selected_line: "",
       batches_dict: {},
       batchesData: [
-        // {
-        //   batch_id: 1,
-        //   recipe: "Dakota Rice",
-        //   packs_produced: 2352,
-        //   end_time: "12/02/2999 12:23",
-        //   kpi: 0.6,
-        // },
-        // {
-        //   batch_id: 2,
-        //   recipe: "Mineroia Rice",
-        //   packs_produced: 23152,
-        //   end_time: "12/03/2999 12:23",
-        //   kpi: 0.3,
-        // },
       ],
       pieChart: {
         data: {

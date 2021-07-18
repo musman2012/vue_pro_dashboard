@@ -1,8 +1,8 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <h4 class="card-title">Tasks</h4>
-      <p class="category">Backend development</p>
+      <h4 class="card-title">Machine Related Tasks</h4>
+      <p class="category">Maintenance Required</p>
     </div>
     <div class="card-content">
       <div class="table-full-width table-tasks">

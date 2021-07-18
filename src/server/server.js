@@ -92,7 +92,7 @@ app.get('/search', function (req, res) {
         size: 200,
         from: 0,
         sort : [
-            { "@timestamp" : {"format": "strict_date_optional_time_nanos"}}
+            { "@timestamp" : {"order": "desc", "format": "strict_date_optional_time_nanos"}}
         ],
         query: {
             // Recipe: req.query['q'],
