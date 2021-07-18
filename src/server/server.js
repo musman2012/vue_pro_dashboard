@@ -91,6 +91,9 @@ app.get('/search', function (req, res) {
     let body = {
         size: 200,
         from: 0,
+        sort : [
+            { "@timestamp" : {"format": "strict_date_optional_time_nanos"}}
+        ],
         query: {
             // Recipe: req.query['q'],
             // FLAG: 'END'
