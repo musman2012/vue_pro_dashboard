@@ -11,6 +11,7 @@
             start-placeholder="Start Date"
             end-placeholder="End Date"
             value-format="yyyy-MM-dd"
+            @input="datePicked"
           >
           </el-date-picker>
         </fg-input>
@@ -24,7 +25,7 @@
           :remote-method="filter"
           size="large"
           placeholder="Select Line"
-          v-model="line_names.simple"
+          v-model="selected_line"
         >
           <el-option
             v-for="option in line_names.fetched_lines"
@@ -212,6 +213,7 @@ export default {
       totalPacks: "140",
       totalCost: "$ 9,999",
       value: "",
+      selected_line: "",
       batches_dict: {},
       batchesData: [
         // {
@@ -261,6 +263,11 @@ export default {
   methods: {
     filter(query) {
       console.log("In Filter function." + query);
+    },
+    datePicked(d) {
+      console.log("Date picked called with " + d);
+      console.log("Selected line is " + this.selected_line);
+      this.dispatch(this.selected_line);
     },
     dispatch(e) {
       console.log("Dispathc " + e);
