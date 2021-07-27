@@ -34,8 +34,8 @@
           <sidebar-item :link="{name: 'Full Screen Maps', path: '/maps/full-screen'}"></sidebar-item>
           <sidebar-item :link="{name: 'Vector Maps', path: '/maps/vector-map'}"></sidebar-item>
         </sidebar-item> -->
-        <!-- <sidebar-item :link="{name: 'Charts', icon: 'nc-icon nc-chart-bar-32', path: '/admin/charts'}"></sidebar-item> -->
-        <sidebar-item :link="{name: 'Calendar', icon: 'nc-icon nc-single-copy-04', path: '/admin/calendar'}"></sidebar-item>
+        <!-- <sidebar-item :link="{name: 'Charts', icon: 'nc-icon nc-chart-bar-32', path: '/admin/charts'}"></sidebar-item>
+        <sidebar-item :link="{name: 'Calendar', icon: 'nc-icon nc-single-copy-04', path: '/admin/calendar'}"></sidebar-item> -->
         <sidebar-item :link="{name: 'Authentication', icon: 'nc-icon nc-layers-3'}">
           <!-- <sidebar-item :link="{name: 'User Page', path: '/pages/user'}"></sidebar-item> -->
           <sidebar-item :link="{name: 'Login Page', path: '/login'}"></sidebar-item>

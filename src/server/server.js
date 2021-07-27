@@ -132,6 +132,46 @@ app.get('/search', function (req, res) {
         });
 
 });
+
+app.get('/fetchPerfData', function (req, res) {
+    console.log("search reqs recvd");
+    let body = {
+        size: 500,
+        from: 0,
+        sort : [
+            { "@timestamp" : {"order": "asc", "format": "strict_date_optional_time_nanos"}}
+        ],
+        query: {
+            // Recipe: req.query['q'],
+            // FLAG: 'END'
+            bool: {
+                must: [
+                    {
+                        match: {
+                            Batch_ID: req.query['q']
+                        }
+                    },
+                    {
+                        match: {
+                            FLAG: "SCALE"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    console.log(body);
+    client.search({ index: 'dev-mw-1', body: body, type: '_doc' })
+        .then(results => {
+            res.send(results.hits.hits);
+        })
+        .catch(err => {
+            console.log(err)
+            res.send([]);
+        });
+
+});
+
 //fetchBatchData
 app.get('/fetchBatchData', function (req, res) {
     console.log("search reqs recvd");

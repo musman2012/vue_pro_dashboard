@@ -74,9 +74,9 @@
       </div>
 
       <div class="col-xl-3 col-md-6">
-        <stats-card title="+45K" subTitle="System Health">
+        <stats-card v-bind:title="labours_num" subTitle="Active Labours:">
           <div slot="header" class="icon-info">
-            <i class="nc-icon nc-favourite-28 text-primary"></i>
+            <i class="nc-icon nc-single-02 text-primary"></i>
           </div>
           <template slot="footer">
             <i class="fa fa-refresh"></i>Updated now
@@ -111,6 +111,17 @@
       </div>
     </div>
 
+    <card>
+      <div class="row">
+        <div class="col-md-6" >
+          <div id="perfGraph"></div>
+        </div>
+
+        <div class="col-md-6" >
+          <div id="perfGraphWght"></div>
+        </div>
+      </div>
+    </card>
     <!-- change data on Dropdown select and see if graphs/tables are updated -->
     <!-- we can use v-bind:key to batch id -- Better to use a Batches Data attribute to use everywhere -->
     <div class="row">
@@ -214,6 +225,7 @@ export default {
       editTooltip: "Edit Task",
       deleteTooltip: "Remove",
       totalPacks: "140",
+      labours_num: "24",
       totalCost: "$ 9,999",
       value: "",
       selected_line: "",
@@ -264,16 +276,16 @@ export default {
   },
   methods: {
     filter(query) {
-      console.log("In Filter function." + query);
+      // console.log("In Filter function." + query);
     },
     datePicked(d) {
-      console.log("Date picked called with " + d);
-      console.log("Selected line is " + this.selected_line);
+      // console.log("Date picked called with " + d);
+      // console.log("Selected line is " + this.selected_line);
       this.dispatch(this.selected_line);
     },
     dispatch(e) {
-      console.log("Dispathc " + e);
-      console.log("Value of date time picker is " + this.value[0]);
+      // console.log("Dispathc " + e);
+      // console.log("Value of date time picker is " + this.value[0]);
       var bg_colors = [];
       var colors = [
         "#3e818e",
@@ -304,8 +316,8 @@ export default {
           var temp_packs = 0;
           var temp_cost = 0;
           //this.totalPacks = 0;
-          console.log("Good oye@@@@@@");
-          // console.log(this.pieChart.data);
+          // console.log("Good oye@@@@@@");
+          // // console.log(this.pieChart.data);
           var temp_data = response.data;
           temp_data.forEach((element) => {
             // MAKE THE WHOLE DATA ACCESSIBLE THROUGH BATCH ID
@@ -339,12 +351,12 @@ export default {
           if (window.counter > 0) {
             document.getElementById("canvas" + (counter - 1)).remove();
           }
-          console.log("RCP count keys:");
+          // console.log("RCP count keys:");
           for (var c = 0; c < Object.keys(recipe_pack_count).length; c++) {
             bg_colors.push(colors[c]);
           }
-          console.log(Object.keys(recipe_pack_count));
-          console.log(Object.values(recipe_pack_count));
+          // console.log(Object.keys(recipe_pack_count));
+          // console.log(Object.values(recipe_pack_count));
           const data = {
             labels: Object.keys(recipe_pack_count),
             datasets: [
@@ -372,31 +384,148 @@ export default {
           });
           myChart.resize(200, 200);
           window.counter += 1;
-          console.log("PieChart Data");
+          // console.log("PieChart Data");
 
           this.batchesData = batch_tbl_data;
 
-          console.log(this.pieChart.data);
+          // console.log(this.pieChart.data);
         });
       // this.search(e);
+    },
+    drawPerformanceGraphs(batchID) {
+      // test this function and build upon
+      axios.get("http://18.168.19.93:5000/fetchPerfData?q="+batchID)
+      .then((response) => {
+        var batch_ppms_2d = {};
+        var batch_times_2d = {};
+        var dict_check = {};
+        var batch_wght_2d = {};
+
+        var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
+        //console.log(jsoned_batch_data);
+        
+        for (var j = 0; j < jsoned_batch_data.length; j++) {
+            var fields = jsoned_batch_data[j]._source;
+            //window.batch_ppms.push(fields.PPM[0].toString());
+            var scale = parseInt(fields.Scale);
+            var avg_wght = parseInt(fields.Avg_Wght);
+            var ppm = fields.PPM.toString();
+            var time_field = fields.TIMESTAMP;
+            var tkns = time_field.split(" ");
+            var times = tkns[1];
+            if (scale in batch_ppms_2d){
+             
+              batch_ppms_2d[scale].push(ppm);
+              batch_times_2d[scale].push(times);
+              batch_wght_2d[scale].push(avg_wght);
+            }
+            else {
+              dict_check[scale] = fields.Op_Name;
+              batch_ppms_2d[scale] = [ppm]; //[ppm];
+              batch_times_2d[scale] = [times];
+              batch_wght_2d[scale] = [avg_wght];
+            }   
+        }
+        console.log(batch_ppms_2d);
+        var data = []; var data2 = [];
+        var dict_size = Object.keys(batch_ppms_2d).length;
+        console.log("Size of PPMs " + dict_size);
+        // this loop is not working I think
+        for(var i = 0; i < dict_size; i++) {
+          var trace = {
+            x: batch_times_2d[i],
+            y: batch_ppms_2d[i],
+            type: "scatter",
+            name: dict_check[i],
+            mode: "lines"
+          };
+          console.log(trace);
+          data.push(trace);
+          
+          var trace2 = {
+            x: batch_times_2d[i],
+            y: batch_wght_2d[i],
+            type: "scatter",
+            name: dict_check[i],
+            mode: "lines"
+          };
+          console.log(trace2);
+          data2.push(trace2);
+        }
+        
+        console.log(data);
+        console.log("Operators");
+        console.log(dict_check);
+
+        var layout = {
+          width: 510,
+          height: 380,
+          title: "Batch Operators Performance - Batch # " + batchID,
+          //title_font_size: 3,
+          xaxis: {
+            //tickmode: "linear",
+            title: "Time",
+            titlefont: {
+              family: "Calibiri",
+              size: 11,
+              color: "lightgrey",
+            },
+            showticklabels: true,
+            tickangle: 90,
+            tickfont: {
+              family: "Old Standard TT, serif",
+              size: 10,
+              color: "black",
+            },
+            //exponentformat: 'e',
+            // showexponent: "all",
+          },
+          yaxis: {
+            title: "Number of Packs",
+            titlefont: {
+              family: "Arial, sans-serif",
+              size: 10,
+              color: "lightgrey",
+            },
+            showticklabels: true,
+            tickangle: 45,
+            tickfont: {
+              family: "Old Standard TT, serif",
+              size: 10,
+              color: "black",
+            },
+            exponentformat: "e",
+            // showexponent: "all",
+            },
+          };
+
+        Plotly.newPlot("perfGraph", data, layout)
+        .update_layout(title_font_size=2);
+
+        Plotly.newPlot("perfGraphWght", data2, layout)
+        .update_layout(title_font_size=2);
+
+      });
     },
     drawRealTimeGraph(batchID) {
       window.batch_ppms = [];
       window.batch_times = [];
-      var scale_val = 1; // TODO: this scale_val can be added in a loop so that data for every scale can be fetched and plotted on the same graph
+      var scale_val = 1; // TODO: We can get data from SC_AG flag where we are aggregating all PPMs
+      // this scale_val can be added in a loop so that data for every scale can be fetched and plotted on the same graph
       // get Scale_QT for this Batch and this loop will run for Scale_QT times
+      // ToDo: Plot User PPM and User Avg Weights
       axios
         .get(
           "http://18.168.19.93:5000/fetchBatchData?q=" +
             batchID +
             "&scale=" +
             scale_val.toString()
-        ) //&sDate=01/08/2020&eDate=04/08/2020')
+        ) //&sDate=01/08/2020&eDate=04/08/2020')  
         .then((response) => {
           // window.batchData = response.data;
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-          console.log("JSONed Data");
-          console.log(jsoned_batch_data);
+          // console.log("JSONed Data");
+          // console.log(jsoned_batch_data);
           for (var j = 0; j < jsoned_batch_data.length; j++) {
             var fields = jsoned_batch_data[j]._source;
             //window.batch_ppms.push(fields.PPM[0].toString());
@@ -419,7 +548,7 @@ export default {
                 color: "lightgrey",
               },
               showticklabels: true,
-              tickangle: 45,
+              tickangle: 90,
               tickfont: {
                 family: "Old Standard TT, serif",
                 size: 10,
@@ -457,15 +586,19 @@ export default {
           // n_times = window.batch_times;
           Plotly.newPlot("realTimeGraph", data, layout)
           .update_layout(title_font_size=2);
+
+          
         });
+        this.drawPerformanceGraphs(batchID);
+        
     },
     generateReport(batchID) {
-      console.log("Generate report for batch " + batchID);
+      // console.log("Generate report for batch " + batchID);
       axios
         .get("http://18.168.19.93:5000/fetchBatchReportData?q=" + batchID) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
           // window.batchData = response.data;
-          //console.log(response);
+          //// console.log(response);
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
 
           var batch_end_data = [];
@@ -478,7 +611,7 @@ export default {
           var scales_sp = {};
           var scales_weight = {};
 
-          console.log(response.data.length);
+          // console.log(response.data.length);
           // values against the keys will be number of packs produced
           for (let i = 0; i < jsoned_batch_data.length; i++) {
             var scale_record = jsoned_batch_data[i]._source;
@@ -510,10 +643,10 @@ export default {
               scales_weight[operator] = weight;
             }
           }
-          console.log(batch_end_data);
-          console.log(batch_start_data);
-          console.log(scales_ppm);
-          console.log(scales_t1);
+          // console.log(batch_end_data);
+          // console.log(batch_start_data);
+          // console.log(scales_ppm);
+          // console.log(scales_t1);
           var doc = new jsPDF();
           doc.setFont("times");
           // doc.setFont('Helvetica');
@@ -531,7 +664,7 @@ export default {
           doc.save("a4.pdf");
         });
 
-      console.log(batchID);
+      // console.log(batchID);
     },
     addRow(table, qty, name, desc, price) {
       var tr = table.row();
@@ -569,7 +702,7 @@ export default {
       var table_body = [];
       window.scales_kpi = [];
       for (const [operator, ppm] of Object.entries(scales_ppm)) {
-        // console.log(key, value);
+        // // console.log(key, value);
         var t1 = scales_t1[operator];
         var ga = (scales_weight[operator] - scales_sp[operator]) / ppm;
         ga = ga.toFixed(2);
@@ -726,7 +859,7 @@ export default {
           4,
           "F"
         ); // filled red square
-        console.log("Bar length is " + Math.floor(kpi * 0.6));
+        // console.log("Bar length is " + Math.floor(kpi * 0.6));
         //counter += 1;
         block_three = bar_chart_row + i * 8 + row_indent;
       }
@@ -797,14 +930,14 @@ export default {
       axios
         .get("http://18.168.19.93:5000/search?q=" + Line) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
-          console.log("Good oye@@@@@@");
+          // console.log("Good oye@@@@@@");
 
           this.data2 = response.data;
           return true;
         });
     },
     drawGraphs() {
-      console.log("Dispathc " + e);
+      // console.log("Dispathc " + e);
     },
   },
 };
