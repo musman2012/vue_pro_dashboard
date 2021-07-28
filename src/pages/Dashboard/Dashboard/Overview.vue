@@ -113,11 +113,16 @@
 
     <card>
       <div class="row">
-        <div class="col-md-6" >
+        <div class="col-md-12" >
           <div id="perfGraph"></div>
         </div>
+        
+      </div>
+    </card>
 
-        <div class="col-md-6" >
+    <card>
+      <div class="row">
+        <div class="col-md-12" >
           <div id="perfGraphWght"></div>
         </div>
       </div>
@@ -409,6 +414,7 @@ export default {
             //window.batch_ppms.push(fields.PPM[0].toString());
             var scale = parseInt(fields.Scale);
             var avg_wght = parseInt(fields.Avg_Wght);
+            avg_wght = avg_wght.toString();
             var ppm = fields.PPM.toString();
             var time_field = fields.TIMESTAMP;
             var tkns = time_field.split(" ");
@@ -426,7 +432,7 @@ export default {
               batch_wght_2d[scale] = [avg_wght];
             }   
         }
-        console.log(batch_ppms_2d);
+        // console.log(batch_ppms_2d);
         var data = []; var data2 = [];
         var dict_size = Object.keys(batch_ppms_2d).length;
         console.log("Size of PPMs " + dict_size);
@@ -439,7 +445,7 @@ export default {
             name: dict_check[i],
             mode: "lines"
           };
-          console.log(trace);
+          // console.log(trace);
           data.push(trace);
           
           var trace2 = {
@@ -449,16 +455,12 @@ export default {
             name: dict_check[i],
             mode: "lines"
           };
-          console.log(trace2);
+          // console.log(trace2);
           data2.push(trace2);
         }
         
-        console.log(data);
-        console.log("Operators");
-        console.log(dict_check);
-
         var layout = {
-          width: 510,
+          width: 800,
           height: 380,
           title: "Batch Operators Performance - Batch # " + batchID,
           //title_font_size: 3,
@@ -498,14 +500,67 @@ export default {
             // showexponent: "all",
             },
           };
+          
 
-        Plotly.newPlot("perfGraph", data, layout)
-        .update_layout(title_font_size=2);
+        console.log("Data")
+        console.log(data);
 
-        Plotly.newPlot("perfGraphWght", data2, layout)
-        .update_layout(title_font_size=2);
+        console.log("Data 2")
+        console.log(data2);
+
+        Plotly.newPlot("perfGraph", data, layout);
+        //.update_layout(title_font_size=2);
+
+        this.drawWghtGraph(batchID, data2);
+        // Plotly.newPlot("perfGraphWght", data2, layout)
+        // .update_layout(title_font_size=2);
 
       });
+    },
+    drawWghtGraph(batchID, data2) {
+        var layout = {
+          width: 800,
+          height: 380,
+          title: "Average Weight Operators - Batch # " + batchID,
+          //title_font_size: 3,
+          xaxis: {
+            //tickmode: "linear",
+            title: "Time",
+            titlefont: {
+              family: "Calibiri",
+              size: 11,
+              color: "lightgrey",
+            },
+            showticklabels: true,
+            tickangle: 90,
+            tickfont: {
+              family: "Old Standard TT, serif",
+              size: 10,
+              color: "black",
+            },
+            //exponentformat: 'e',
+            // showexponent: "all",
+          },
+          yaxis: {
+            title: "Average Weight",
+            titlefont: {
+              family: "Arial, sans-serif",
+              size: 10,
+              color: "lightgrey",
+            },
+            showticklabels: true,
+            tickangle: 45,
+            tickfont: {
+              family: "Old Standard TT, serif",
+              size: 10,
+              color: "black",
+            },
+            exponentformat: "e",
+            // showexponent: "all",
+            },
+          };
+          Plotly.newPlot("perfGraphWght", data2, layout)
+          .update_layout(title_font_size=2);
     },
     drawRealTimeGraph(batchID) {
       window.batch_ppms = [];
