@@ -117,11 +117,11 @@
           <div id="perfGraph"></div>
         </div>
         
-      </div>
+      <!-- </div>
     </card>
 
     <card>
-      <div class="row">
+      <div class="row"> -->
         <div class="col-md-12" >
           <div id="perfGraphWght"></div>
         </div>
@@ -147,6 +147,7 @@
                 property="end_time"
               ></el-table-column>
               <el-table-column label="KPI" property="kpi"></el-table-column>
+              <el-table-column label="Cost Per Pack(£)" property="cost"></el-table-column>
               <el-table-column label="Actions">
                 <div class="td-actions" slot-scope="props">
                   <a
@@ -334,6 +335,7 @@ export default {
               packs_produced: source_data.Total_Packs,
               end_time: source_data.TIMESTAMP,
               kpi: source_data.KPI,
+              cost: source_data.Pack_Cost
             };
             temp_packs += entry.packs_produced;
             temp_cost += source_data.Pack_Cost;
@@ -384,7 +386,19 @@ export default {
               title: {
                 display: true,
                 text: 'Production w.r.t Lines (Hover on slices)'
-              }              
+              },
+              onClick:function(e){
+                var activePoints = myChart.getElementsAtEvent(e);
+                var selectedIndex = activePoints[0]._index;
+                var selectedRecipe = this.data.labels[selectedIndex];
+                // console.log(this.data.datasets[0].data[selectedIndex]);
+                // console.log(activePoints[0]._index);
+                // console.log(this.data.datasets[0])
+                console.log(selectedRecipe);
+                // Call update table function here
+              }
+              //this.graphClicked
+            //  events: ['click', 'mouseover']              
             }
           });
           myChart.resize(200, 200);
@@ -396,6 +410,10 @@ export default {
           // console.log(this.pieChart.data);
         });
       // this.search(e);
+    },
+    graphClicked(event, array) {
+      console.log("Graph clicked");
+      console.log(event);
     },
     drawPerformanceGraphs(batchID) {
       // test this function and build upon
@@ -460,8 +478,8 @@ export default {
         }
         
         var layout = {
-          width: 800,
-          height: 380,
+          width: 1000,
+          height: 300,
           title: "Batch Operators Performance - Batch # " + batchID,
           //title_font_size: 3,
           xaxis: {
@@ -497,15 +515,16 @@ export default {
               color: "black",
             },
             exponentformat: "e",
+         //   legend: list(font = list(size = 30))
             // showexponent: "all",
-            },
-          };
+          },
+        };
           
 
-        console.log("Data")
+        console.log("Data");
         console.log(data);
 
-        console.log("Data 2")
+        console.log("Data 2");
         console.log(data2);
 
         Plotly.newPlot("perfGraph", data, layout);
@@ -519,8 +538,8 @@ export default {
     },
     drawWghtGraph(batchID, data2) {
         var layout = {
-          width: 800,
-          height: 380,
+          width: 1000,
+          height: 300,
           title: "Average Weight Operators - Batch # " + batchID,
           //title_font_size: 3,
           xaxis: {
