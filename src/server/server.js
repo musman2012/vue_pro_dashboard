@@ -88,12 +88,54 @@ app.get('/getCredsDB', function (req, res) {
 
 app.get('/search', function (req, res) {
     console.log("search reqs recvd");
+
+    let body2 = {
+        size: 200,
+        from: 0,
+        sort : [
+            { "@timestamp" : {"order": "desc", "format": "strict_date_optional_time_nanos"}}
+        ],
+        //fuzziness: "AUTO: 0,2",
+        query: {
+            // Recipe: req.query['q'],
+            // FLAG: 'END'
+            bool: {
+                must: [
+                    {
+                        match: {
+                            Line: req.query['q']
+                        }
+                    },
+                    {
+                        match: {
+                            FLAG: "END"
+                        }
+                    },
+                    {
+                        match: {
+                            Recipe: req.query['recipe']
+                        }
+                    },
+                    {
+                        range: {
+                            "@timestamp": {
+                                gte: req.query['sDate'],
+                                lte: req.query['eDate']
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+
     let body = {
         size: 200,
         from: 0,
         sort : [
             { "@timestamp" : {"order": "desc", "format": "strict_date_optional_time_nanos"}}
         ],
+        
         query: {
             // Recipe: req.query['q'],
             // FLAG: 'END'
@@ -121,8 +163,13 @@ app.get('/search', function (req, res) {
             }
         }
     }
-    console.log(body);
-    client.search({ index: 'dev-mw-1', body: body, type: '_doc' })
+    //console.log(body);
+    var selected_body = body;
+    if (req.query['recipe'] !== '*'){
+        selected_body = body2;
+    }
+    console.log(selected_body)
+    client.search({ index: 'dev-mw-1', body: selected_body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })

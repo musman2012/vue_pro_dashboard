@@ -292,6 +292,7 @@ export default {
     dispatch(e) {
       // console.log("Dispathc " + e);
       // console.log("Value of date time picker is " + this.value[0]);
+      this.selected_line = e;
       var bg_colors = [];
       var colors = [
         "#3e818e",
@@ -309,11 +310,12 @@ export default {
       axios
         .get(
           "http://18.168.19.93:5000/search?q=" +
-            e +
+            this.selected_line +
             "&sDate=" +
             this.value[0] +
             "&eDate=" +
-            this.value[1]
+            this.value[1] +
+            "&recipe=*"
         )
         .then((response) => {
           var batch_tbl_data = [];
@@ -376,6 +378,7 @@ export default {
               },
             ],
           };
+          const self = this;
           var myChart = new Chart(myobj, {
             type: "pie",
             data: data,
@@ -389,12 +392,52 @@ export default {
               },
               onClick:function(e){
                 var activePoints = myChart.getElementsAtEvent(e);
+                var updated_tbl_data = [];
+                console.log("Graph clikced");
+                console.log(activePoints);
                 var selectedIndex = activePoints[0]._index;
+                console.log(selectedIndex);
                 var selectedRecipe = this.data.labels[selectedIndex];
+                console.log(selectedRecipe);
+                console.log(self.selected_line)
+                console.log(  "---" + self.value[0]);
+                axios.get(
+                "http://18.168.19.93:5000/search?q=" +
+                  self.selected_line +
+                  "&sDate=" +
+                  self.value[0] +
+                  "&eDate=" +
+                  self.value[1] +
+                  "&recipe=" +
+                  selectedRecipe
+              )
+              .then((response) => {
+                console.log("New table data fetched.")
+                console.log(response.data);
+
+                var temp_data = response.data;
+                temp_data.forEach((element) => {
+                  // MAKE THE WHOLE DATA ACCESSIBLE THROUGH BATCH ID
+                  // THIS NEW DATASET VAR WILL BE USED TO 1- DRAW GRAPH 2- GENERATE REPORT
+                  var source_data = element._source;
+                  var entry = {
+                    batch_id: source_data.Batch_ID,
+                    recipe: source_data.Recipe,
+                    packs_produced: source_data.Total_Packs,
+                    end_time: source_data.TIMESTAMP,
+                    kpi: source_data.KPI,
+                    cost: source_data.Pack_Cost
+                  };
+                  
+                  updated_tbl_data.push(entry);
+                  entry = {};
+                });
+                self.batchesData = updated_tbl_data;
+              });
                 // console.log(this.data.datasets[0].data[selectedIndex]);
                 // console.log(activePoints[0]._index);
                 // console.log(this.data.datasets[0])
-                console.log(selectedRecipe);
+                
                 // Call update table function here
               }
               //this.graphClicked
@@ -410,6 +453,9 @@ export default {
           // console.log(this.pieChart.data);
         });
       // this.search(e);
+    },
+    updateTableBody(selectedRecipe) {
+        
     },
     graphClicked(event, array) {
       console.log("Graph clicked");
