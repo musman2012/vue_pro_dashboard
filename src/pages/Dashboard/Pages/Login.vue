@@ -98,19 +98,31 @@ extend("min", min);
         //  + "&Password=" + this.password) //&sDate=01/08/2020&eDate=04/08/2020')
         .then((response) => {
           //this.$router.push({ name: 'Login' })
-            console.log(response.data[0].Password);
-            window.fetched_password = response.data[0].Password;
-            console.log("Fetched "+fetched_password+" Written "+this.password);
-            if (window.fetched_password == this.password)
-                this.$router.push({ name: 'Overview' })
+            console.log(response);
+            if (response.data.length > 0) {
+              console.log(response.data[0].Password);
+              window.fetched_password = response.data[0].Password;
+              console.log("Fetched "+fetched_password+" Written "+this.password);
+              if (window.fetched_password == this.password)
+                this.$router.push({ name: 'Overview' });
+              else{
+                console.log("Password incorrent");
+                 Swal.fire({
+                    title: `Credentials incorrect.`,
+                    buttonsStyling: true,
+                    confirmButtonClass: 'btn btn-success btn-fill'
+                  })
+              }
+
+            }
             else {
             //     <l-alert type="danger" dismissible="">
             //   <span>
             //     <b> Danger - </b> This is a regular notification made with ".alert-danger"</span>
             // </l-alert>
-                 console.log("Password incorrent");
+                 console.log("Email incorrect");
                  Swal.fire({
-                    title: `Credentials incorrect.`,
+                    title: `Account cannot found.`,
                     buttonsStyling: true,
                     confirmButtonClass: 'btn btn-success btn-fill'
                   })

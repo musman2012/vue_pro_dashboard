@@ -95,7 +95,7 @@ app.get('/search', function (req, res) {
         sort : [
             { "@timestamp" : {"order": "desc", "format": "strict_date_optional_time_nanos"}}
         ],
-        //fuzziness: "AUTO: 0,2",
+        //fuzziness: "AUTO:0,2",
         query: {
             // Recipe: req.query['q'],
             // FLAG: 'END'
@@ -169,7 +169,7 @@ app.get('/search', function (req, res) {
         selected_body = body2;
     }
     console.log(selected_body)
-    client.search({ index: 'dev-mw-1', body: selected_body, type: '_doc' })
+    client.search({ index: 'dev-mw-test', body: selected_body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })
@@ -208,7 +208,7 @@ app.get('/fetchPerfData', function (req, res) {
         }
     }
     console.log(body);
-    client.search({ index: 'dev-mw-1', body: body, type: '_doc' })
+    client.search({ index: 'dev-mw-test', body: body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })
@@ -225,6 +225,9 @@ app.get('/fetchBatchData', function (req, res) {
     let body = {
         size: 500,
         from: 0,
+        sort : [
+            { "@timestamp" : {"order": "asc", "format": "strict_date_optional_time_nanos"}}
+        ],
         query: {
             // Recipe: req.query['q'],
             // FLAG: 'END'
@@ -250,7 +253,7 @@ app.get('/fetchBatchData', function (req, res) {
         }
     }
     console.log(body);
-    client.search({ index: 'dev-mw-1', body: body, type: '_doc' })
+    client.search({ index: 'dev-mw-test', body: body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })
@@ -281,7 +284,7 @@ app.get('/fetchBatchReportData', function (req, res) {
         }
     }
     console.log(body);
-    client.search({ index: 'dev-mw-1', body: body, type: '_doc' })
+    client.search({ index: 'dev-mw-test', body: body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })
