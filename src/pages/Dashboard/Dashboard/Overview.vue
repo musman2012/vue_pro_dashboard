@@ -756,7 +756,8 @@ export default {
               scales_sp[operator] += sp;
               scales_weight[operator] += weight;
               //scales_kpi[operator] = (ppm / batch_runtime) * target_speed;
-            } else {
+            } else if (operator != undefined) {
+
               scales_ppm[operator] = ppm;
               scales_t1[operator] = t1ppm;
               scales_sp[operator] = sp;
@@ -770,6 +771,8 @@ export default {
           var doc = new jsPDF();
           doc.setFont("times");
           // doc.setFont('Helvetica');
+          console.log("Scales PPM:");
+          console.log(scales_ppm);
           this.write_report_content(
             doc,
             batch_end_data,
@@ -972,13 +975,16 @@ export default {
         if (kpi > 100) {
           doc_obj.setFillColor("4C9900");
         }
-        doc_obj.rect(
-          bar_chart_col,
-          bar_chart_row + i * 8,
-          Math.floor(kpi * 0.7),
-          4,
-          "F"
-        ); // filled red square
+        if (kpi > 0) {
+            doc_obj.rect(
+            bar_chart_col,
+            bar_chart_row + i * 8,
+            Math.floor(kpi * 0.7),
+            4,
+            "F"
+          ); // filled red square
+        }
+        
         // console.log("Bar length is " + Math.floor(kpi * 0.6));
         //counter += 1;
         block_three = bar_chart_row + i * 8 + row_indent;
