@@ -468,10 +468,12 @@ export default {
         var batch_ppms_2d = {};
         var batch_times_2d = {};
         var dict_check = {};
+        var scales = [];
         var batch_wght_2d = {};
 
         var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-        //console.log(jsoned_batch_data);
+        // console.log("JSONED Data . . . . . . ");
+        // console.log(jsoned_batch_data);
         
         for (var j = 0; j < jsoned_batch_data.length; j++) {
             var fields = jsoned_batch_data[j]._source;
@@ -483,40 +485,46 @@ export default {
             var time_field = fields.TIMESTAMP;
             var tkns = time_field.split(" ");
             var times = tkns[1];
-            if (scale in batch_ppms_2d){
-             
+            if (scale in dict_check){
               batch_ppms_2d[scale].push(ppm);
               batch_times_2d[scale].push(times);
               batch_wght_2d[scale].push(avg_wght);
             }
             else {
+              console.log("New scale found in data");
+              console.log("Scale : "+scale+" Operator : "+fields.Op_Name);
+              scales.push(scale);
               dict_check[scale] = fields.Op_Name;
               batch_ppms_2d[scale] = [ppm]; //[ppm];
               batch_times_2d[scale] = [times];
               batch_wght_2d[scale] = [avg_wght];
             }   
         }
-        // console.log(batch_ppms_2d);
+        console.log("Dict check: ");
+        console.log(dict_check);
+        console.log("Batch PPMs: ");
+        console.log(batch_ppms_2d);
         var data = []; var data2 = [];
         var dict_size = Object.keys(batch_ppms_2d).length;
         console.log("Size of PPMs " + dict_size);
         // this loop is not working I think
         for(var i = 0; i < dict_size; i++) {
+          var index = scales[i];
           var trace = {
-            x: batch_times_2d[i],
-            y: batch_ppms_2d[i],
+            x: batch_times_2d[index],
+            y: batch_ppms_2d[index],
             type: "scatter",
-            name: dict_check[i],
+            name: dict_check[index],
             mode: "lines"
           };
           // console.log(trace);
           data.push(trace);
           
-          var trace2 = {
-            x: batch_times_2d[i],
-            y: batch_wght_2d[i],
+        var trace2 = {
+            x: batch_times_2d[index],
+            y: batch_wght_2d[index],
             type: "scatter",
-            name: dict_check[i],
+            name: dict_check[index],
             mode: "lines"
           };
           // console.log(trace2);
@@ -757,7 +765,6 @@ export default {
               scales_weight[operator] += weight;
               //scales_kpi[operator] = (ppm / batch_runtime) * target_speed;
             } else if (operator != undefined) {
-
               scales_ppm[operator] = ppm;
               scales_t1[operator] = t1ppm;
               scales_sp[operator] = sp;
@@ -984,9 +991,6 @@ export default {
             "F"
           ); // filled red square
         }
-        
-        // console.log("Bar length is " + Math.floor(kpi * 0.6));
-        //counter += 1;
         block_three = bar_chart_row + i * 8 + row_indent;
       }
       // rect(starting_x, starting_y, width, height, 'F')
