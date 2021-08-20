@@ -240,12 +240,7 @@ app.get('/fetchBatchData', function (req, res) {
                     },
                     {
                         match: {
-                            FLAG: "SCALE"
-                        }
-                    },
-                    {
-                        match: {
-                            Scale: req.query['scale']
+                            FLAG: "SC_AG"
                         }
                     }
                 ]

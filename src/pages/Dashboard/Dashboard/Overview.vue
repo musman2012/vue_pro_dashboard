@@ -652,12 +652,12 @@ export default {
         .then((response) => {
           // window.batchData = response.data;
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-          // console.log("JSONed Data");
-          // console.log(jsoned_batch_data);
+          console.log("JSONed Data");
+          console.log(jsoned_batch_data);
           for (var j = 0; j < jsoned_batch_data.length; j++) {
             var fields = jsoned_batch_data[j]._source;
             //window.batch_ppms.push(fields.PPM[0].toString());
-            window.batch_ppms[j] = fields.PPM.toString();
+            window.batch_ppms[j] = fields.PPM_AG.toString();
             var time_field = fields.TIMESTAMP;
             var tkns = time_field.split(" ");
             window.batch_times.push(tkns[1]);
@@ -873,7 +873,7 @@ export default {
         block_two = row_2 + row_indent;
       var tbl_row = block_two + 5 * row_indent;
       var tbl_width = 100;
-      var bar_chart_col = 115;
+      var bar_chart_col = 110;
       var bar_chart_row = tbl_row + 13;
       var block_three = -99;
       var block_four = block_three + 7 * row_indent;
@@ -970,7 +970,11 @@ export default {
         head: [["Name", "Total Packs", "KPI %", "GA g", "T1 %"]],
         startY: tbl_row,
         body: table_body,
-        styles: { cellWidth: 20 },
+        columnStyles: { 0: {cellWidth: 25},
+                  1: {cellWidth: 20},
+                  2: {cellWidth: 20},
+                  3: {cellWidth: 15},
+                  4: {cellWidth: 15} },
         theme: "grid",
       });
 
