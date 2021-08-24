@@ -4,6 +4,7 @@ import NotFound from 'src/pages/GeneralViews/NotFoundPage.vue'
 // Dashboard pages
 import Overview from 'src/pages/Dashboard/Dashboard/Overview.vue'
 import Stats from 'src/pages/Dashboard/Dashboard/Stats.vue'
+import EngData from 'src/pages/Dashboard/Dashboard/EngData.vue'
 
 // Pages
 import User from 'src/pages/Dashboard/Pages/UserProfile.vue'
@@ -220,6 +221,11 @@ const routes = [
         path: 'stats',
         name: 'Stats',
         component: Stats
+      },
+      {
+        path: 'engdata',
+        name: 'EngData',
+        component: EngData
       },
       {
         path: 'calendar',

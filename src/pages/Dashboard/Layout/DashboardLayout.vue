@@ -9,6 +9,8 @@
         </sidebar-item>
         <sidebar-item :link="{name: 'Machine Data', icon: 'nc-icon nc-android', path: '/admin/stats'}">
         </sidebar-item>
+        <sidebar-item :link="{name: 'Engineering Data', icon: 'nc-icon nc-settings-90', path: '/admin/engdata'}">
+        </sidebar-item>
         <sidebar-item :link="{name: 'Components', icon: 'nc-icon nc-app'}">
           <sidebar-item :link="{name: 'Buttons', path: '/components/buttons'}"></sidebar-item>
           <sidebar-item :link="{name: 'Grid System', path: '/components/grid-system'}"></sidebar-item>
