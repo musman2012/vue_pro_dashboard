@@ -21,8 +21,8 @@ connection.connect(function(err) {
     }
     console.log('Connected to the MySQL server.');
 });
-
-var auth = 'elastic:PAL@2021_User';
+// PAL@2021_User 
+var auth = 'elastic:UH42cXn5QC3iCkT5EGV3';
 var protocol = 'http';
 var hostUrls = [
     'localhost'
@@ -280,6 +280,71 @@ app.get('/fetchBatchReportData', function (req, res) {
     }
     console.log(body);
     client.search({ index: 'dev-mw-test', body: body, type: '_doc' })
+        .then(results => {
+            res.send(results.hits.hits);
+        })
+        .catch(err => {
+            console.log(err)
+            res.send([]);
+        });
+
+});
+
+app.get('/fetchSealTorqueData', function (req, res) {
+    console.log("search reqs recvd");
+    let body = {
+        size: 500,
+        from: 0,
+        sort : [
+            { "@timestamp" : {"order": "asc", "format": "strict_date_optional_time_nanos"}}
+        ],
+        query: {
+            // Recipe: req.query['q'],
+            // FLAG: 'END'
+            bool: {
+                must: [
+                    {
+                        match: {
+                            FLAG: "ENG_TORQUE" //req.query['q']
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    console.log(body);
+    client.search({ index: 'dev-eng-test', body: body, type: '_doc' })
+        .then(results => {
+            res.send(results.hits.hits);
+        })
+        .catch(err => {
+            console.log(err)
+            res.send([]);
+        });
+
+});
+
+app.get('/fetchAlarmData', function (req, res) {
+    console.log("search reqs recvd");
+    let body = {
+        size: 500,
+        from: 0,
+        query: {
+            // Recipe: req.query['q'],
+            // FLAG: 'END'
+            bool: {
+                must: [
+                    {
+                        match: {
+                            FLAG: "ENG_ALARM" //req.query['q']
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    console.log(body);
+    client.search({ index: 'dev-eng-test', body: body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })
