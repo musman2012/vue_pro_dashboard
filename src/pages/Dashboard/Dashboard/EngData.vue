@@ -1,5 +1,52 @@
 <template>
-  <div> 
+  <div>
+    <div class="row">
+    
+      <div class="col-xl-3 col-md-6">
+        <stats-card v-bind:title="max_seal_torque" subTitle="Max Seal Torque">
+          <div slot="header" class="icon-warning">
+            <i class="nc-icon nc-circle text-warning"></i>
+          </div>
+          <template slot="footer">
+            <i class="fa fa-refresh"></i>Updated now
+          </template>
+        </stats-card>
+      </div>
+
+      <div class="col-xl-3 col-md-6">
+        <stats-card v-bind:title="avg_seal_torque" subTitle="Avg. Seal Torque">
+          <div slot="header" class="icon-warning">
+            <i class="nc-icon nc-chart text-warning"></i>
+          </div>
+          <template slot="footer">
+            <i class="fa fa-refresh"></i>Updated now
+          </template>
+        </stats-card>
+      </div>
+
+      <div class="col-xl-3 col-md-6">
+        <stats-card v-bind:title="num_cycles" subTitle="Total Cycles">
+          <div slot="header" class="icon-warning">
+            <i class="nc-icon nc-refresh-02 text-warning"></i>
+          </div>
+          <template slot="footer">
+            <i class="fa fa-refresh"></i>Updated now
+          </template>
+        </stats-card>
+      </div>
+
+      <div class="col-xl-3 col-md-6">
+        <stats-card v-bind:title="max_seal_torque" subTitle="TBD">
+          <div slot="header" class="icon-warning">
+            <i class="nc-icon nc-chart text-warning"></i>
+          </div>
+          <template slot="footer">
+            <i class="fa fa-refresh"></i>Updated now
+          </template>
+        </stats-card>
+      </div>
+    
+    </div> 
     <!-- <div class="row">
         <div class="col-xl-3 col-md-6">
           <stats-card v-bind:title="num_machines" subTitle="Running Machines">
@@ -47,7 +94,7 @@
       </div> -->
     <card>
       <div class="col-md-6">
-        <div id="sealTorqueGraph"></div>
+        <div id="cyclesGraph"></div>
       </div>
     </card>
     
@@ -85,7 +132,11 @@
     data () {
       return {
         num_machines: "15",
+        max_seal_torque: "1234",
+        avg_seal_torque: "4321",
+        num_cycles: "4567",
         healthy_machines: "14",
+        seal_torque_data: null,
         salesChart: {
           data: {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -177,34 +228,35 @@
         }
       }
     },
-    mounted(){
+    beforeCreate(){
       let chart_js = document.createElement("script");
-    let plotly = document.createElement("script");
-    let d3 = document.createElement("script");
-    let d3_colors = document.createElement("script");
+      let plotly = document.createElement("script");
+      let d3 = document.createElement("script");
+      let d3_colors = document.createElement("script");
 
-    chart_js.setAttribute(
-      "src",
-      "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"
-    );
-    document.head.appendChild(chart_js);
-    plotly.setAttribute("src", "https://cdn.plot.ly/plotly-latest.min.js");
-    document.head.appendChild(plotly);
-    d3.setAttribute(
-      "src",
-      "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.js"
-    );
-    document.head.appendChild(d3);
-    d3_colors.setAttribute(
-      "src",
-      "https://cdnjs.cloudflare.com/ajax/libs/d3-color/1.2.1/d3-color.js"
-    );
-    document.head.appendChild(d3_colors);
-
+      chart_js.setAttribute(
+        "src",
+        "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"
+      );
+      document.head.appendChild(chart_js);
+      plotly.setAttribute("src", "https://cdn.plot.ly/plotly-latest.min.js");
+      document.head.appendChild(plotly);
+      d3.setAttribute(
+        "src",
+        "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.js"
+      );
+      document.head.appendChild(d3);
+      d3_colors.setAttribute(
+        "src",
+        "https://cdnjs.cloudflare.com/ajax/libs/d3-color/1.2.1/d3-color.js"
+      );
+      document.head.appendChild(d3_colors);
+    },
+    mounted(){
     // document.getElementById("sealTorqueGraph").innerHTML="Seal Torque Data Fetched";
-    this.drawSealTorqueGraph();
-    //document.getElementById("engAlarmGraph").innerHTML="Alarm Data Fetched";
-    this.drawAlarmGraph();
+      this.drawSealTorqueGraph();
+      //document.getElementById("engAlarmGraph").innerHTML="Alarm Data Fetched";
+      // this.drawCyclesGraph();
     },
     methods: {
       drawSealTorqueGraph() {
@@ -212,18 +264,28 @@
         axios.get("http://18.168.19.93:5000/fetchSealTorqueData")
         .then((response) => {
           
-          var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-          console.log(jsoned_batch_data);
+          // var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
+          
+          // console.log(jsoned_batch_data);
 
           var jsoned_seal_data = JSON.parse(JSON.stringify(response.data));
-          // console.log(jsoned_seal_data);
+          this.seal_torque_data = jsoned_seal_data;
+          console.log(jsoned_seal_data);
+          this.drawCyclesGraph();
           var seals = [];
-          var seal_times = [];
+          var seal_times = []; 
+          var data_records = jsoned_seal_data.length;
+          this.num_cycles = data_records.toString();
+          var max_seal = 0; var sum_seal = 0;
 
-          for (var j = 0; j < jsoned_seal_data.length; j++) {
+          for (var j = 0; j < data_records; j++) {
             var fields = jsoned_seal_data[j]._source;
             //window.batch_ppms.push(fields.PPM[0].toString());
             var seal = parseInt(fields.Seal_Torque);
+            sum_seal += seal;
+            if (seal > max_seal) {
+              max_seal = seal;
+            }
             var sealTime = fields.TIMESTAMP;
             var tkns = sealTime.split(" ");
             var times = tkns[1];
@@ -232,6 +294,9 @@
           }
           console.log("Seals and Times");
           console.log(seals);
+          this.max_seal_torque = max_seal.toString();
+          sum_seal = sum_seal / data_records;
+          this.avg_seal_torque = sum_seal.toString();
           console.log(seal_times);
 
           var trace = {
@@ -290,15 +355,17 @@
 
         });
       },
-      drawAlarmGraph() {
+      drawCyclesGraph() {
         // test this function and build upon
-        axios.get("http://18.168.19.93:5000/fetchAlarmData")
-        .then((response) => {
+        // axios.get("http://18.168.19.93:5000/fetchAlarmData")
+        // .then((response) => {
           
-          var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-          console.log(jsoned_batch_data)
+        //   var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
+        //   console.log(jsoned_batch_data)
 
-        });
+        // });
+        console.log("Draw Cycles Graph");
+        console.log(this.seal_torque_data)
       }
     }
   }
