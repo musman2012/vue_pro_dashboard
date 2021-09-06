@@ -45,8 +45,18 @@
           </template>
         </stats-card>
       </div>
-    
+
     </div> 
+
+    <div class="row">
+      <!-- <div id="cal-heatmap"></div> -->
+      <calendar-heatmap :values="cal_data" 
+      :end-date="cal_end" />
+    </div>
+
+    <div class="row">
+      <div id="cal-heatmap"></div>
+    </div>
     <!-- <div class="row">
         <div class="col-xl-3 col-md-6">
           <stats-card v-bind:title="num_machines" subTitle="Running Machines">
@@ -119,6 +129,9 @@
   import StatsCard from "src/components/Cards/StatsCard.vue";
   import Progress from "easy-circular-progress";
   import axios from "axios";
+  // import CalHeatMap from 'cal-heatmap';
+  // import 'cal-heatmap/cal-heatmap.css';
+  import { CalendarHeatmap } from 'vue-calendar-heatmap';
 
   export default {
     components: {
@@ -127,6 +140,7 @@
       ChartCard,
       TaskList,
       StatsCard,
+      CalendarHeatmap,
       Progress
     },
     data () {
@@ -137,22 +151,8 @@
         num_cycles: "4567",
         healthy_machines: "14",
         seal_torque_data: null,
-        salesChart: {
-          data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            series: [
-              [542, 543, 520, 680, 653, 753, 326, 434, 568, 610, 756, 895],
-              [230, 293, 380, 480, 503, 553, 600, 664, 698, 710, 736, 795]
-            ]
-          },
-          options: {
-            seriesBarDistance: 10,
-            axisX: {
-              showGrid: false
-            },
-            height: '245px'
-          }
-        },
+        cal_data: [{ date: '2021-08-01', count: 26 }, { date: '2021-09-05', count: 316 }],
+        cal_end: '2021-09-10',
         usersChart: {
           data: {
             labels: ['9AM', '12AM', '3PM', '6PM', '9PM', '12PM', '3AM', '6AM'],
@@ -233,6 +233,8 @@
       let plotly = document.createElement("script");
       let d3 = document.createElement("script");
       let d3_colors = document.createElement("script");
+      let cal_hm_js = document.createElement("script");
+      let cal_hm_css = document.createElement("style");
 
       chart_js.setAttribute(
         "src",
@@ -243,7 +245,7 @@
       document.head.appendChild(plotly);
       d3.setAttribute(
         "src",
-        "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.js"
+        "https://d3js.org/d3.v3.min.js"
       );
       document.head.appendChild(d3);
       d3_colors.setAttribute(
@@ -251,6 +253,16 @@
         "https://cdnjs.cloudflare.com/ajax/libs/d3-color/1.2.1/d3-color.js"
       );
       document.head.appendChild(d3_colors);
+      cal_hm_js.setAttribute(
+        "src",
+        "https://cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js"
+      );
+      document.head.appendChild(cal_hm_js);
+      cal_hm_css.setAttribute(
+        "src",
+        "https://cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.css"
+      );
+      document.head.appendChild(cal_hm_css);
     },
     mounted(){
     // document.getElementById("sealTorqueGraph").innerHTML="Seal Torque Data Fetched";
