@@ -119,6 +119,46 @@
         <div id="engAlarmGraph"></div>
       </div>
     </card>
+
+    <div class="row">
+      
+      <div class="col-lg-4">
+        <h5 class="title">Select Starting and Ending Date</h5>
+        <fg-input>
+          <el-date-picker
+            v-model="value"
+            type="daterange"
+            start-placeholder="Start Date"
+            end-placeholder="End Date"
+            value-format="yyyy-MM-dd"
+            @input="datePicked"
+          >
+          </el-date-picker>
+        </fg-input>
+      </div>
+
+      <div class="col-md-6">
+        <h5 class="title">Select Alarm Type</h5>
+        <el-select
+          @input="dispatch"
+          class="select-danger"
+          :remote-method="filter"
+          size="large"
+          placeholder="Select Type"
+          v-model="selected_alarm_type"
+        >
+          <el-option
+            v-for="option in alarms.alarm_types"
+            class="select-danger"
+            :value="option.value"
+            :label="option.label"
+            :key="option.label"
+          >
+          </el-option>
+        </el-select>
+      </div>
+    </div>
+
   </div>
 </template>
 <script>
@@ -131,12 +171,17 @@
   import axios from "axios";
   // import CalHeatMap from 'cal-heatmap';
   // import 'cal-heatmap/cal-heatmap.css';
+  import { DatePicker, TimeSelect,  Select, Option } from 'element-ui';
   import { CalendarHeatmap } from 'vue-calendar-heatmap';
 
   export default {
     components: {
       TimeLine,
       TimeLineItem,
+      [DatePicker.name]: DatePicker,
+      [TimeSelect.name]: TimeSelect,
+      [Option.name]: Option,
+      [Select.name]: Select,
       ChartCard,
       TaskList,
       StatsCard,
@@ -150,11 +195,22 @@
         avg_seal_torque: "4321",
         num_cycles: "4567",
         healthy_machines: "14",
+        selected_alarm_type: "",
         seal_torque_data: null,
+        value: "",
         // cal_data needs to be updated
         // after fetching complete cycle data, iterate it to create a json with date and count keys
         cal_data: [{ date: '2021-08-01', count: 26 }, { date: '2021-09-05', count: 316 }],
         cal_end: '2021-10-10',
+        alarms: {
+        simple: "",
+        alarm_types: [
+            { value: "AT 1", label: "AT 1" },
+            { value: "AT 2", label: "AT 2" },
+            { value: "AT 3", label: "AT 3" },
+            { value: "AT 4", label: "AT 4" },
+          ],
+        },
         usersChart: {
           data: {
             labels: ['9AM', '12AM', '3PM', '6PM', '9PM', '12PM', '3AM', '6AM'],
@@ -273,6 +329,17 @@
       // this.drawCyclesGraph();
     },
     methods: {
+      filter(query) {
+        console.log("In Filter function." + query);
+      },
+      datePicked(d) {
+        console.log("Date picked called with " + d);
+        // console.log("Selected line is " + this.selected_line);
+        // this.dispatch(this.selected_line);
+      },
+      dispatch(e) {
+        console.log("Dispathc " + e);
+      },
       drawSealTorqueGraph() {
         // test this function and build upon
         axios.get("http://18.168.19.93:5000/fetchSealTorqueData")
@@ -373,25 +440,15 @@
         // test this function and build upon
         // axios.get("http://18.168.19.93:5000/fetchAlarmData")
         // .then((response) => {
-          
-        //   var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-        //   console.log(jsoned_batch_data)
-
+   
         // });
-        console.log("Draw Cycles Graph");
+    
         var num_cycles_per_day = [];
         var cycles_dict = {};
-        console.log(this.seal_torque_data);
         var num_records = this.seal_torque_data.length;
         // TODO: Iterate through seal_torque_data and create JSON data5
         for (var j = 0; j < num_records; j++) {
             var fields = this.seal_torque_data[j]._source;
-            //window.batch_ppms.push(fields.PPM[0].toString());
-            // var seal = parseInt(fields.Seal_Torque);
-            // sum_seal += seal;
-            // if (seal > max_seal) {
-            //   max_seal = seal;
-            // }
             var sealTime = fields.TIMESTAMP;
             var tkns = sealTime.split(" ");
             var times = tkns[0].split("/");
@@ -412,10 +469,9 @@
           num_cycles_per_day.push(temp);
           temp = {};
         }
-        console.log("Before");
-        console.log(this.cal_data);
+
         this.cal_data = num_cycles_per_day;
-        console.log("After");
+        console.log("Calendar Heatmap Data");
         console.log(this.cal_data);
       }
     }
