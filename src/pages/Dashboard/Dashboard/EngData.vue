@@ -151,8 +151,10 @@
         num_cycles: "4567",
         healthy_machines: "14",
         seal_torque_data: null,
+        // cal_data needs to be updated
+        // after fetching complete cycle data, iterate it to create a json with date and count keys
         cal_data: [{ date: '2021-08-01', count: 26 }, { date: '2021-09-05', count: 316 }],
-        cal_end: '2021-09-10',
+        cal_end: '2021-10-10',
         usersChart: {
           data: {
             labels: ['9AM', '12AM', '3PM', '6PM', '9PM', '12PM', '3AM', '6AM'],
@@ -377,7 +379,44 @@
 
         // });
         console.log("Draw Cycles Graph");
-        console.log(this.seal_torque_data)
+        var num_cycles_per_day = [];
+        var cycles_dict = {};
+        console.log(this.seal_torque_data);
+        var num_records = this.seal_torque_data.length;
+        // TODO: Iterate through seal_torque_data and create JSON data5
+        for (var j = 0; j < num_records; j++) {
+            var fields = this.seal_torque_data[j]._source;
+            //window.batch_ppms.push(fields.PPM[0].toString());
+            // var seal = parseInt(fields.Seal_Torque);
+            // sum_seal += seal;
+            // if (seal > max_seal) {
+            //   max_seal = seal;
+            // }
+            var sealTime = fields.TIMESTAMP;
+            var tkns = sealTime.split(" ");
+            var times = tkns[0].split("/");
+            times = times[2]+"-"+times[1]+"-"+times[0];
+            if (times in cycles_dict) {
+              cycles_dict[times] += 1; 
+            }
+            else {
+              cycles_dict[times] = 1;
+            }
+        }
+        console.log("Num cycles dict");
+        console.log(cycles_dict);
+
+        for (const [key, value] of Object.entries(cycles_dict)) {
+          //console.log(key, value);
+          var temp = {date: key, count: value};
+          num_cycles_per_day.push(temp);
+          temp = {};
+        }
+        console.log("Before");
+        console.log(this.cal_data);
+        this.cal_data = num_cycles_per_day;
+        console.log("After");
+        console.log(this.cal_data);
       }
     }
   }
