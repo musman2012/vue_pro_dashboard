@@ -116,7 +116,7 @@
 
     <card>
       <div class="col-md-6">
-        <div id="engAlarmGraph"></div>
+        <div id="motorTempGraph"></div>
       </div>
     </card>
 
@@ -352,6 +352,7 @@
     mounted(){
     // document.getElementById("sealTorqueGraph").innerHTML="Seal Torque Data Fetched";
       this.drawSealTorqueGraph();
+      this.drawMotorTempGraph();
       //document.getElementById("engAlarmGraph").innerHTML="Alarm Data Fetched";
       // this.drawCyclesGraph();
     },
@@ -385,6 +386,14 @@
       },
       dispatch(e) {
         console.log("Dispathc " + e);
+      },
+      drawMotorTempGraph(){
+        axios.get("http://18.168.19.93:5000/fetchMotorTempData")
+        .then((response) => {
+            var jsoned_temperature_data = JSON.parse(JSON.stringify(response.data));
+            console.log("Temperature Data")
+            console.log(jsoned_temperature_data);
+        });
       },
       drawSealTorqueGraph() {
         // test this function and build upon

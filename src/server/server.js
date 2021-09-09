@@ -324,6 +324,38 @@ app.get('/fetchSealTorqueData', function (req, res) {
 
 });
 
+app.get('/fetchMotorTempData', function (req, res) {
+    let body = {
+        size: 1000,
+        from: 0,
+        sort : [
+            { "@timestamp" : {"order": "asc", "format": "strict_date_optional_time_nanos"}}
+        ],
+        query: {
+            // Recipe: req.query['q'],
+            // FLAG: 'END'
+            bool: {
+                must: [
+                    {
+                        match: {
+                            FLAG: "ENG_TEMP" //req.query['q']
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    console.log(body);
+    client.search({ index: 'dev-eng-test', body: body, type: '_doc' })
+        .then(results => {
+            res.send(results.hits.hits);
+        })
+        .catch(err => {
+            console.log(err)
+            res.send([]);
+        });
+});
+
 app.get('/fetchAlarmData', function (req, res) {
     console.log("search reqs recvd");
     let body = {
