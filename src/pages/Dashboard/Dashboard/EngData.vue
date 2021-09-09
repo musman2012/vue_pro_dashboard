@@ -137,7 +137,7 @@
         </fg-input>
       </div>
 
-      <div class="col-md-6">
+      <!-- <div class="col-md-6">
         <h5 class="title">Select Alarm Type</h5>
         <el-select
           @input="dispatch"
@@ -156,6 +156,30 @@
           >
           </el-option>
         </el-select>
+      </div> -->
+    </div>
+
+    <!-- Alarm Data Table -->
+    <div class="row">
+      <div class="col-md-12">
+        <card>
+          <div slot="header">
+            <h4 class="card-title">Alarm Data table</h4>
+          </div>
+          <div class="table-responsive table-full-width">
+            <el-table :data="alarmData">
+              <el-table-column prop="alarm_time" label="Timestamp">
+              </el-table-column>
+              <el-table-column prop="machine_id" label="Machine ID"> </el-table-column>
+              <el-table-column prop="alarm_description" label="Alarm Description">
+              </el-table-column>
+              <el-table-column
+                label="Group"
+                property="alarm_group"
+              ></el-table-column>
+            </el-table>
+          </div>
+        </card>
       </div>
     </div>
 
@@ -171,7 +195,7 @@
   import axios from "axios";
   // import CalHeatMap from 'cal-heatmap';
   // import 'cal-heatmap/cal-heatmap.css';
-  import { DatePicker, TimeSelect,  Select, Option } from 'element-ui';
+  import { DatePicker, TimeSelect,  Select, Option, Table, TableColumn } from 'element-ui';
   import { CalendarHeatmap } from 'vue-calendar-heatmap';
 
   export default {
@@ -182,6 +206,8 @@
       [TimeSelect.name]: TimeSelect,
       [Option.name]: Option,
       [Select.name]: Select,
+      [Table.name]: Table,
+      [TableColumn.name]: TableColumn,
       ChartCard,
       TaskList,
       StatsCard,
@@ -195,6 +221,7 @@
         avg_seal_torque: "4321",
         num_cycles: "4567",
         healthy_machines: "14",
+        alarmData: [],
         selected_alarm_type: "",
         seal_torque_data: null,
         value: "",
@@ -202,15 +229,15 @@
         // after fetching complete cycle data, iterate it to create a json with date and count keys
         cal_data: [{ date: '2021-08-01', count: 26 }, { date: '2021-09-05', count: 316 }],
         cal_end: '2021-10-10',
-        alarms: {
-        simple: "",
-        alarm_types: [
-            { value: "AT 1", label: "AT 1" },
-            { value: "AT 2", label: "AT 2" },
-            { value: "AT 3", label: "AT 3" },
-            { value: "AT 4", label: "AT 4" },
-          ],
-        },
+        // alarms: {
+        // simple: "",
+        // alarm_types: [
+        //     { value: "AT 1", label: "AT 1" },
+        //     { value: "AT 2", label: "AT 2" },
+        //     { value: "AT 3", label: "AT 3" },
+        //     { value: "AT 4", label: "AT 4" },
+        //   ],
+        // },
         usersChart: {
           data: {
             labels: ['9AM', '12AM', '3PM', '6PM', '9PM', '12PM', '3AM', '6AM'],
@@ -333,9 +360,28 @@
         console.log("In Filter function." + query);
       },
       datePicked(d) {
-        console.log("Date picked called with " + d);
+        console.log("Date picked called with " + this.value[0] + "----" + this.value[1]);
+        var alarm_tbl_data = [];
         // console.log("Selected line is " + this.selected_line);
         // this.dispatch(this.selected_line);
+        axios.get("http://18.168.19.93:5000/fetchAlarmData?sDate="+ this.value[0]+"&eDate="+ this.value[1])
+        .then((response) => {
+            var jsoned_alarm_data = JSON.parse(JSON.stringify(response.data));
+            console.log(jsoned_alarm_data);
+            var alarm_data_records = jsoned_alarm_data.length;
+            for (var j = 0; j < alarm_data_records; j++) {
+              var fields = jsoned_alarm_data[j]._source;
+              var entry = {
+                alarm_time: fields.TIMESTAMP,
+                machine_id: fields.Machine_ID,
+                alarm_description: fields.Alarm_Text,
+                alarm_group: fields.Group,
+              };
+              alarm_tbl_data.push(entry);
+              entry = {};
+            }
+            this.alarmData = alarm_tbl_data;  
+        });
       },
       dispatch(e) {
         console.log("Dispathc " + e);
@@ -438,11 +484,7 @@
       },
       drawCyclesGraph() {
         // test this function and build upon
-        // axios.get("http://18.168.19.93:5000/fetchAlarmData")
-        // .then((response) => {
-   
-        // });
-    
+        
         var num_cycles_per_day = [];
         var cycles_dict = {};
         var num_records = this.seal_torque_data.length;

@@ -327,8 +327,11 @@ app.get('/fetchSealTorqueData', function (req, res) {
 app.get('/fetchAlarmData', function (req, res) {
     console.log("search reqs recvd");
     let body = {
-        size: 500,
+        size: 1000,
         from: 0,
+        sort : [
+            { "@timestamp" : {"order": "asc", "format": "strict_date_optional_time_nanos"}}
+        ],
         query: {
             // Recipe: req.query['q'],
             // FLAG: 'END'
@@ -337,6 +340,14 @@ app.get('/fetchAlarmData', function (req, res) {
                     {
                         match: {
                             FLAG: "ENG_ALARM" //req.query['q']
+                        }
+                    },
+                    {
+                        range: {
+                            "@timestamp": {
+                                gte: req.query['sDate'],
+                                lte: req.query['eDate']
+                            }
                         }
                     }
                 ]
