@@ -391,9 +391,88 @@
         axios.get("http://18.168.19.93:5000/fetchMotorTempData")
         .then((response) => {
             var jsoned_temperature_data = JSON.parse(JSON.stringify(response.data));
-            console.log("Temperature Data")
-            console.log(jsoned_temperature_data);
-        });
+            console.log("Temperature Data");
+            //console.log(jsoned_temperature_data);
+            var data_records = jsoned_temperature_data.length;
+            var num_of_machines = 6;
+            var machine_temp = {};
+            var machine_times = [];
+            for (var i = 1; i <= num_of_machines; i++) {
+                machine_temp[i] = [];
+            }
+
+            for (var j = 0; j < data_records; j++) {
+              var fields = jsoned_temperature_data[j]._source;
+              //window.batch_ppms.push(fields.PPM[0].toString());
+              machine_temp[1].push(parseInt(fields.Temp_M1));
+              machine_temp[2].push(parseInt(fields.Temp_M2));
+              machine_temp[3].push(parseInt(fields.Temp_M3));
+              machine_temp[4].push(parseInt(fields.Temp_M4));
+              machine_temp[5].push(parseInt(fields.Temp_M5));
+              machine_temp[6].push(parseInt(fields.Temp_M6));
+              machine_times.push(fields.TIMESTAMP);
+            }
+            console.log(machine_temp);
+            var data = [];
+
+            for(var i = 1; i < 7; i++) {
+              var trace = {
+                x: machine_times,
+                y: machine_temp[i],
+                type: "scatter",
+                name: "Machine "+i,
+                mode: "lines"
+              };
+              // console.log(trace);
+              data.push(trace);
+            }
+
+            var layout = {
+              width: 1000,
+              height: 300,
+              title: "Machines Temperatures",
+              //title_font_size: 3,
+              xaxis: {
+                //tickmode: "linear",
+                title: "Time",
+                titlefont: {
+                  family: "Calibiri",
+                  size: 11,
+                  color: "lightgrey",
+                },
+                showticklabels: true,
+                tickangle: 90,
+                tickfont: {
+                  family: "Old Standard TT, serif",
+                  size: 10,
+                  color: "black",
+                },
+                //exponentformat: 'e',
+                // showexponent: "all",
+              },
+              yaxis: {
+                title: "Temperature",
+                titlefont: {
+                  family: "Arial, sans-serif",
+                  size: 10,
+                  color: "lightgrey",
+                },
+                showticklabels: true,
+                tickangle: 45,
+                tickfont: {
+                  family: "Old Standard TT, serif",
+                  size: 10,
+                  color: "black",
+                },
+                exponentformat: "e",
+            //   legend: list(font = list(size = 30))
+                // showexponent: "all",
+              },
+            };
+            Plotly.newPlot("motorTempGraph", data, layout);
+            });
+            
+
       },
       drawSealTorqueGraph() {
         // test this function and build upon
