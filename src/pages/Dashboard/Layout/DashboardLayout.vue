@@ -11,7 +11,7 @@
         </sidebar-item>
         <sidebar-item :link="{name: 'Engineering Data', icon: 'nc-icon nc-settings-90', path: '/admin/engdata'}">
         </sidebar-item>
-        <sidebar-item :link="{name: 'Components', icon: 'nc-icon nc-app'}">
+        <!-- <sidebar-item :link="{name: 'Components', icon: 'nc-icon nc-app'}">
           <sidebar-item :link="{name: 'Buttons', path: '/components/buttons'}"></sidebar-item>
           <sidebar-item :link="{name: 'Grid System', path: '/components/grid-system'}"></sidebar-item>
           <sidebar-item :link="{name: 'Panels', path: '/components/panels'}"></sidebar-item>
@@ -19,7 +19,7 @@
           <sidebar-item :link="{name: 'Notifications', path: '/components/notifications'}"></sidebar-item>
           <sidebar-item :link="{name: 'Icons', path: '/components/icons'}"></sidebar-item>
           <sidebar-item :link="{name: 'Typography', path: '/components/typography'}"></sidebar-item>
-        </sidebar-item>
+        </sidebar-item> -->
         <!-- <sidebar-item :link="{name: 'Forms', icon: 'nc-icon nc-notes'}">
           <sidebar-item :link="{name: 'Regular Forms', path: '/forms/regular'}"></sidebar-item>
           <sidebar-item :link="{name: 'Extended Forms', path: '/forms/extended'}"></sidebar-item>

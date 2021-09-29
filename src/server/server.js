@@ -169,8 +169,9 @@ app.get('/search', function (req, res) {
         selected_body = body2;
     }
     console.log(selected_body)
-    client.search({ index: 'dev-mw-test', body: selected_body, type: '_doc' })
+    client.search({ index: 'dev-mw-test1', body: selected_body, type: '_doc' })
         .then(results => {
+            console.log(results.hits.hits);
             res.send(results.hits.hits);
         })
         .catch(err => {
@@ -208,7 +209,7 @@ app.get('/fetchPerfData', function (req, res) {
         }
     }
     console.log(body);
-    client.search({ index: 'dev-mw-test', body: body, type: '_doc' })
+    client.search({ index: 'dev-mw-test1', body: body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })
@@ -248,7 +249,7 @@ app.get('/fetchBatchData', function (req, res) {
         }
     }
     console.log(body);
-    client.search({ index: 'dev-mw-test', body: body, type: '_doc' })
+    client.search({ index: 'dev-mw-test1', body: body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })
@@ -262,7 +263,7 @@ app.get('/fetchBatchData', function (req, res) {
 app.get('/fetchBatchReportData', function (req, res) {
     console.log("search reqs recvd");
     let body = {
-        size: 500,
+        size: 1000,
         from: 0,
         query: {
             // Recipe: req.query['q'],
@@ -279,7 +280,7 @@ app.get('/fetchBatchReportData', function (req, res) {
         }
     }
     console.log(body);
-    client.search({ index: 'dev-mw-test', body: body, type: '_doc' })
+    client.search({ index: 'dev-mw-test1', body: body, type: '_doc' })
         .then(results => {
             res.send(results.hits.hits);
         })

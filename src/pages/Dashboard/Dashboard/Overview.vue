@@ -324,7 +324,8 @@ export default {
           var temp_packs = 0;
           var temp_cost = 0;
           //this.totalPacks = 0;
-          // console.log("Good oye@@@@@@");
+          console.log("Good oye@@@@@@");
+          console.log(response);
           // // console.log(this.pieChart.data);
           var temp_data = response.data;
           temp_data.forEach((element) => {
@@ -472,8 +473,8 @@ export default {
         var batch_wght_2d = {};
 
         var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-        // console.log("JSONED Data . . . . . . ");
-        // console.log(jsoned_batch_data);
+        console.log("JSONED Data . . . . . . ");
+        console.log(jsoned_batch_data);
         
         for (var j = 0; j < jsoned_batch_data.length; j++) {
             var fields = jsoned_batch_data[j]._source;
@@ -712,8 +713,8 @@ export default {
 
           var data = [trace1];
           // n_times = window.batch_times;
-          Plotly.newPlot("realTimeGraph", data, layout)
-          .update_layout(title_font_size=2);
+      //    Plotly.newPlot("realTimeGraph", data, layout)
+      //    .update_layout(title_font_size=2);
 
           
         });
@@ -728,7 +729,8 @@ export default {
           // window.batchData = response.data;
           //// console.log(response);
           var jsoned_batch_data = JSON.parse(JSON.stringify(response.data));
-
+          console.log("JSONED Data ........");
+          console.log(jsoned_batch_data);
           var batch_end_data = [];
           var batch_start_data = [];
           var target_speed = 0;

@@ -101,13 +101,13 @@
             </template>
           </stats-card>
         </div>
-      </div> -->
+      </div>
     <card>
       <div class="col-md-6">
         <div id="cyclesGraph"></div>
       </div>
     </card>
-    
+     -->.
     <card>
       <div class="col-md-6">
         <div id="sealTorqueGraph2"></div>
@@ -502,10 +502,10 @@
               max_seal = seal;
             }
             var sealTime = fields.TIMESTAMP;
-            var tkns = sealTime.split(" ");
-            var times = tkns[1];
+            // var tkns = sealTime.split(" ");
+            // var times = tkns[1];
             seals.push(seal);
-            seal_times.push(times);
+            seal_times.push(sealTime);
           }
           console.log("Seals and Times");
           console.log(seals);
@@ -548,7 +548,7 @@
             // showexponent: "all",
           },
           yaxis: {
-            title: "Number of Packs",
+            title: "Seal Torque",
             titlefont: {
               family: "Arial, sans-serif",
               size: 10,
